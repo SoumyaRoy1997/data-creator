@@ -1,0 +1,148 @@
+@import "./shared.scss";
+$color: #ddd;
+
+@media screen {
+    .mat-table {
+      border: 0;
+      vertical-align: middle
+    }
+  .example-container {
+      position: relative;
+      min-height: 200px;
+      background-color: $color;
+    }
+    
+    .example-table-container {
+      position: relative;
+      max-height: 100%;
+      overflow: auto;
+      background-color: $color;
+    }
+    
+    table {
+     width: 100%;
+    }
+    
+    .example-loading-shade {
+      position: absolute;
+      @include _margin(0,56px,0,0);
+      background: rgba(0, 0, 0, 0.15);
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .example-rate-limit-reached {
+      color: #980000;
+      max-width: 360px;
+      text-align: center;
+    }
+    
+    /* Column Widths */
+    .mat-column-FlightId,
+    .mat-column-Departure,
+    .mat-column-Arrival{
+      max-width: 100px;
+      align-items: center;
+    }
+    
+    .mat-column-Passenger {
+      max-width: 64px;
+      align-items: center;
+    }
+    .mat-sort-header-container {
+    align-items: center;
+  }
+  .example-container {
+    display: flex;
+    flex-direction: column;
+    max-height: 500px;
+    min-width: 300px;
+    background-color: $color;
+  }
+  
+  .mat-table {
+    overflow: auto;
+    max-height: 500px;
+  }
+  
+}
+
+.mat-form-field {
+    font-size: 14px;
+    width: 100%;
+    text-decoration-color: black;
+  }
+  table,.mat-paginator{
+    width: 100%;
+    background-color: rgb(222, 237, 238);
+   }
+
+   .example-container {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    @include _margin(0,0,0,0);
+    background-color: $color;
+  }
+
+  .mat-button.btn.btn-success.is-active{
+    background: #333;
+  }
+  
+
+.btn.btn-info, .mat-button.btn.btn-info, .mat-raised-button.btn.btn-info, .mat-raised-button.btn:not([class*=mat-elevation-z]).btn-info {
+    color: #fff;
+    background-color: #00bcd4;
+    border-color: #00bcd4;
+    box-shadow: 0 2px 2px 0 rgba(0,188,212,.14), 0 3px 1px -2px rgba(0,188,212,.2), 0 1px 5px 0 rgba(0,188,212,.12);
+}
+.btn.btn-success, .mat-button.btn.btn-success, .mat-raised-button.btn.btn-success, .mat-raised-button.btn:not([class*=mat-elevation-z]).btn-success {
+    @extend .btn-info;
+    background-color: #4CAF50;
+  
+}
+icons, .btn:not(.btn-just-icon):not(.btn-fab) .fa {
+    position: relative;
+    display: inline-block;
+    top: 0;
+    margin-top: -1em;
+    margin-bottom: -1em;
+    font-size: 1.1rem;
+    vertical-align: middle;
+}
+.material-icons {
+    font:
+    {
+      family: 'Material Icons';
+      weight: normal;
+      style: normal;
+      size: 24px;
+    };
+    
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    /* -webkit-font-feature-settings: 'liga'; */
+    -webkit-font-smoothing: antialiased;
+}
+
+.material-icons.active{
+  color: #4CAF50;
+}
+
+.content{
+  position: inherit;
+}
+.example-is-mobile .example-toolbar {
+    position: fixed;
+    /* Make sure the toolbar will stay on top of the content as it scrolls past. */
+    z-index: 2;
+    background-color: #ddd;
+  }
+  

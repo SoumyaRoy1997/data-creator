@@ -1,0 +1,64 @@
+
+$imageUrl: "../assets/images/background.jpg";
+$myimageUrl: "../../assets/images/background.jpg";
+$imageUrlHeader: "../../../assets/images/background.jpg";
+$myWidth: 100%;
+$myheight: 100%;
+$color: #ddd;
+
+.my-tooltip {
+  white-space: pre-line;
+}
+.green-icon {
+  color: green;
+}
+
+.green-icon svg {
+  fill: green;
+}
+
+.red-icon {
+  color: red;
+}
+
+.red-icon svg {
+  fill: red;
+}
+
+.float-right
+{
+  float: right;
+}
+.float-left
+{
+  float: left;
+}
+.float-centre
+{
+    margin-left: 30%;
+}
+@mixin _margin($top, $bottom , $left , $right)
+{
+  top: $top;
+  left: $left;
+  bottom: $bottom;
+  right: $right;
+}
+
+.mat-spinner
+{
+  max-width: 400px;
+  margin: 2em auto;
+  text-align: center;
+  display: flex;
+}
+
+@mixin _backGroundImage() {
+    height: $myheight;
+    overflow: auto;
+    background: {
+      position: center;
+      repeat: no-repeat;
+      size: cover;
+    };
+}

@@ -1,0 +1,54 @@
+@import "../common/shared.scss";
+  
+mat-label{
+  max-width: 400px;
+  margin: 2em auto;
+  text-align: center;
+  
+}
+
+mat-card {
+ 
+  display: flex;
+  @extend mat-label;
+  
+}  
+button:hover {
+  opacity: 0.8;
+}
+
+/* Extra style for the cancel button (red) */
+.cancelbtn {
+  width: auto;
+  padding: 10px 18px;
+  background-color: #f44336;
+}
+
+/* Center the avatar image inside this container */
+.imgcontainer {
+  text-align: center;
+  margin: 24px 0 12px 0;
+}
+
+/* Avatar image */
+img.avatar {
+  width: 40%;
+  border-radius: 50%;
+}
+
+/* Add padding to containers */
+.container {
+  padding: 16px;
+}
+
+/* The "Forgot password" text */
+span.psw {
+  float: right;
+  padding-top: 16px;
+}
+
+
+
+
+
+

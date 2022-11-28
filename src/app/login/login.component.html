@@ -1,0 +1,37 @@
+<div class="bg-image">
+<mat-spinner *ngIf="loading"  backdropEnabled="true" positionGloballyCenter="true"></mat-spinner>
+<mat-card *ngIf="!loading">
+    <mat-card-content>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmitFirebase(username.value,password.value)">
+        <h2>Log In</h2>
+        <mat-error *ngIf="loginInvalid">
+          The username and password were not recognised
+        </mat-error>
+            
+        <mat-form-field appearance="outline">
+            <mat-label>Username</mat-label>
+            <input matInput #username placeholder="username" class="mdc-floating-label" id="my-label-id" aria-invalid="false" aria-required="true" >
+            <!-- <mat-error *ngIf="loginForm.hasError('required')">
+              Password<strong>required</strong>
+            </mat-error> -->
+           
+         </mat-form-field>
+          
+            <mat-form-field appearance="outline">
+                    <mat-label>passowrd</mat-label>
+                    <input matInput #password placeholder="passowrd" class="mdc-floating-label" id="my-label-id" aria-invalid="false" aria-required="true" [type]="hide ? 'password' : 'text'">
+                    <button type="button" mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+                    <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+                    </button>
+                    <!-- <mat-error *ngIf="loginForm.hasError('required')">
+                      Password<strong>required</strong>
+                    </mat-error> -->
+                   
+        </mat-form-field>
+        <p>
+        <button type="submit" mat-raised-button color="primary">Login</button>
+       </p>
+      </form>
+    </mat-card-content>
+  </mat-card>
+ </div>

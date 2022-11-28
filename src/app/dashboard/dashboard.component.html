@@ -1,0 +1,154 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-2"></div>
+        <mat-spinner *ngIf="loading" backdropEnabled="true" positionGloballyCenter="true"></mat-spinner>
+        <div class="ProgressText" style="padding-left: 50%;" *ngIf="loading" backdropEnabled="true"
+            positionGloballyCenter="true">Your data generation is in Progress ......</div>
+        <div class="col-md-8" *ngIf="!loading">
+            <mat-accordion class="example-headers-align">
+                <mat-expansion-panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle>
+                    <form [formGroup]="dashboardForm" (ngSubmit)="nextStep()">
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                Data Generation Input
+                            </mat-panel-title>
+                            <mat-panel-description>
+                                Provide the input configuration of data generation
+                                <mat-icon>account_circle</mat-icon>
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+                        <mat-form-field appearance="outline">
+                            <mat-label>Data Generation Instance Name</mat-label>
+                            <input matInput #instanceName placeholder="instanceName" formControlName="instanceName">
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                            <mat-label>EC2 Instance</mat-label>
+                            <mat-select [multiple]="true" formControlName="generateloc">
+                                <mat-option value="Localhost">Localhost</mat-option>
+                                <mat-option value="abcd.aws.delta">abcd.aws.delta</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                            <mat-label>Instruction Input Type</mat-label>
+                            <mat-select formControlName="instructionInput">
+                                <mat-option value="Form Input">Form Input</mat-option>
+                                <mat-option value="Upload File">Upload File</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <mat-action-row>
+                            <button mat-button color="primary" type="submit">Next</button>
+                        </mat-action-row>
+                    </form>
+                </mat-expansion-panel>
+                <mat-expansion-panel [expanded]="step === 1" (opened)="setStep(1)" hideToggle>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            Instruction File
+                        </mat-panel-title>
+                        <mat-panel-description>
+                            Provide the Instruction File
+                            <mat-icon>account_circle</mat-icon>
+                        </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    <div *ngIf="inputType === 'Form Input'">
+                        <form [formGroup]="instructionForm">
+                            <div class="float-left">
+                                <ng-container *ngIf="instructionForm.get('isFileLocal').value">
+                                    <mat-label>Upload Sample File</mat-label>
+                                    <input class="form-control" type="file" (change)="onSampleFileChange($event)"
+                                         style="width: 250px;">
+                                        <br>
+                                    <!-- <button (click)="onUpload($event,'Mapping')" class="btn btn-success">
+                                        Upload
+                                    </button> -->
+                                    </ng-container>
+                                <mat-form-field appearance="outline" *ngIf="!instructionForm.get('isFileLocal').value">
+                                    <mat-label>Sample Filename</mat-label>
+                                    <input matInput #sampleFilename placeholder="sampleFilename"
+                                        formControlName="sampleFilename">
+                                </mat-form-field>
+                                <mat-divider></mat-divider>
+                                <mat-form-field appearance="outline">
+                                    <mat-label>File Type</mat-label>
+                                    <input matInput #fileType placeholder="fileType" formControlName="fileType">
+                                </mat-form-field>
+                                <mat-divider></mat-divider>
+                                <mat-form-field appearance="outline">
+                                    <mat-label>File Location</mat-label>
+                                    <input matInput #fileLocation placeholder="fileLocation"
+                                        formControlName="fileLocation">
+                                </mat-form-field>
+                                <mat-divider></mat-divider>
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Output Folder</mat-label>
+                                    <input matInput #outputFolder placeholder="outputFolder"
+                                        formControlName="outputFolder">
+                                </mat-form-field>
+                                <mat-divider></mat-divider>
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Spark Config File</mat-label>
+                                    <input matInput #sparkConfFile placeholder="sparkConfFile"
+                                        formControlName="sparkConfFile">
+                                </mat-form-field>
+                                <mat-divider></mat-divider>
+                                <mat-slide-toggle formControlName="isFileLocal">
+                                    Is File in Local Directory?
+                                </mat-slide-toggle>
+                            </div>
+                            <div class="float-right">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Output Filename</mat-label>
+                                    <input matInput #outputFilename placeholder="outputFilename"
+                                        formControlName="outputFilename">
+                                </mat-form-field>
+                                <mat-divider></mat-divider>
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Folders</mat-label>
+                                    <input matInput #folders placeholder="folders" formControlName="folders">
+                                </mat-form-field>
+                                <mat-divider></mat-divider>
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Files</mat-label>
+                                    <input matInput #files placeholder="files" formControlName="files">
+                                </mat-form-field>
+                                <mat-divider></mat-divider>
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Records</mat-label>
+                                    <input matInput #records placeholder="records" formControlName="records">
+                                </mat-form-field>
+                                <mat-divider></mat-divider>
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Indentation</mat-label>
+                                    <input matInput #indent placeholder="indent" formControlName="indent">
+                                </mat-form-field>
+                                <mat-divider></mat-divider>
+                                <mat-slide-toggle formControlName="sampleFileHeader">
+                                    File Header
+                                </mat-slide-toggle>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="text-center" *ngIf="inputType === 'Upload File'">
+                        <input class="form-control" type="file" (change)="onChange($event)">
+                        <br>
+                        <button (click)="onUpload($event)" class="btn btn-success">
+                            Upload
+                        </button>
+                    </div>
+                    <mat-action-row>
+                        <button mat-button color="warn" (click)="prevStep()">Previous</button>
+                        <button type="submit" mat-button color="danger" (click)="addVariableFields()"
+                            *ngIf="inputType === 'Form Input'"
+                            [disabled]="!this.instructionForm.valid">{{variableFieldButton}}</button>
+                        <button type="submit" mat-button color="primary" (click)="nextStep()"
+                            [disabled]="!this.instructionForm.valid">Next</button>
+                    </mat-action-row>
+                </mat-expansion-panel>
+            </mat-accordion>
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+</div>

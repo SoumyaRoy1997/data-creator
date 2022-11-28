@@ -1,0 +1,65 @@
+@import "../common/shared.scss";
+.mat-stepper-vertical {
+    margin-top: 8px;
+  }
+  
+  .mat-form-field {
+    margin-top: 16px;
+  }
+
+  .example-headers-align .mat-expansion-panel-header-title,
+  .example-headers-align .mat-expansion-panel-header-description {
+    flex-basis: 0;
+  }
+  
+  .example-headers-align .mat-expansion-panel-header-description {
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .example-headers-align .mat-form-field + .mat-form-field {
+    margin-left: 8px;
+  }
+  
+  body{
+    height: auto;
+    text-decoration-color: burlywood;
+    background-color: cornflowerblue;
+   }
+   .float-right
+   {
+       font-family: Verdana, Geneva, Tahoma, sans-serif;
+       color: cadetblue;
+   }
+   .float-left
+   {
+       color: burlywood;
+       
+   }
+   .btn btn-danger{
+       background-color: forestgreen;
+   }
+   
+   cdk-text-field-autofill-monitored:not(:-webkit-autofill) {
+    -webkit-animation-name: cdk-text-field-autofill-end;
+    animation-name: cdk-text-field-autofill-end;
+}
+input.mat-input {
+    margin-top: -.0625em;
+}
+.comment{
+    color: cadetblue;
+}
+.mat-input {
+    font: inherit;
+    background: transparent;
+    color: currentColor;
+    border: black;
+    outline: black;
+    padding: 0;
+    margin: 0;
+    width: auto;
+    max-width: $myWidth;
+    vertical-align: bottom;
+    text-align: inherit;
+}

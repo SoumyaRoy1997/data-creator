@@ -1,0 +1,194 @@
+<mat-dialog-content>
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-9">
+            <mat-card-title>Variable Record Details</mat-card-title>
+        </div>
+        <div class="col-md-1">
+            <i class="material-icons" [mat-dialog-close]="variableFieldArray" color="warn" matTooltip="Close">close</i>
+        </div>
+    </div>
+    <form [formGroup]="variableFieldForm" class="example-headers-align">
+        <div class="float-left" style="justify-content: space-between;">
+            <mat-form-field appearance="outline">
+                <mat-label>Column Name</mat-label>
+                <input matInput #columnName placeholder="Column Name" formControlName="columnName">
+            </mat-form-field>
+            <mat-divider></mat-divider>
+            <mat-form-field appearance="outline">
+                <mat-label>Column Type</mat-label>
+                <input matInput #columnType placeholder="Column Type" formControlName="columnType">
+            </mat-form-field>
+            <mat-divider></mat-divider>
+        </div>
+        <div class="float-right">
+            <mat-form-field appearance="outline">
+                <mat-label>Column Index</mat-label>
+                <input matInput #columnIndex placeholder="Column Index" formControlName="columnIndex">
+            </mat-form-field>
+            <mat-divider></mat-divider>
+            <mat-form-field appearance="outline">
+                <mat-label>Column Length</mat-label>
+                <input matInput #columnLength placeholder="Column Length" formControlName="columnLength">
+            </mat-form-field>
+            <mat-divider></mat-divider>
+        </div>
+        <div>
+            <mat-form-field appearance="outline">
+                <mat-label>Domain</mat-label>
+                <input matInput #domain placeholder="Domain" formControlName="domain">
+            </mat-form-field>
+            <mat-slide-toggle formControlName="isMapped" style="padding-left: 40%;">
+                Mapped
+            </mat-slide-toggle>
+        </div>
+    </form>
+    <ng-container *ngIf="mappedFlag">
+        <form [formGroup]="mappedDetailsForm" class="example-headers-align">
+            <mat-slide-toggle formControlName="fileLocalCheck" style="padding-left: 40%;">
+                Is File Local?
+            </mat-slide-toggle>
+            <div class="float-left" style="justify-content: space-between;">
+                <mat-form-field appearance="outline" *ngIf="mappedDetailsForm.get('fileLocalCheck').value">
+                    <mat-label>Mapped Filename</mat-label>
+                    <input matInput #mappedFilename placeholder="Mapped Filename" formControlName="mappedFilename">
+                </mat-form-field>
+                <ng-container *ngIf="!mappedDetailsForm.get('fileLocalCheck').value">
+                    <mat-label>Mapped Filename</mat-label>
+                    <input class="form-control" type="file" (change)="onChange($event)" formControlName="mappedFilename"
+                        style="width: 250px;">
+                    <!-- <button (click)="onUpload($event,'Mapping')" class="btn btn-success">
+                        Upload
+                    </button> -->
+                </ng-container>
+                <mat-divider></mat-divider>
+                <mat-form-field appearance="outline">
+                    <mat-label>Mapped File Type</mat-label>
+                    <input matInput #mappedFileType placeholder="Mapped File Type" formControlName="mappedFileType">
+                </mat-form-field>
+                <mat-divider></mat-divider>
+                <mat-form-field appearance="outline">
+                    <mat-label>Mapped Delimiter</mat-label>
+                    <input matInput #mappedFileDelim placeholder="Mapped Delimiter" formControlName="mappedFileDelim">
+                </mat-form-field>
+            </div>
+            <div class="float-right">
+                <mat-form-field appearance="outline">
+                    <mat-label>Mapped Column</mat-label>
+                    <input matInput #mappedFileColumn placeholder="Mapped Column" formControlName="mappedFileColumn">
+                </mat-form-field>
+                <mat-divider></mat-divider>
+                <mat-form-field appearance="outline">
+                    <mat-label>Mapped Column Number</mat-label>
+                    <input matInput #mappedFileColumnNum placeholder="Mapped Column Number"
+                        formControlName="mappedFileColumnNum">
+                </mat-form-field>
+                <mat-divider></mat-divider>
+                <mat-slide-toggle formControlName="mappedFileHeader" style="padding-left: 8%;padding-top: 10%;">
+                    Mapped File Header
+                </mat-slide-toggle>
+            </div>
+        </form>
+    </ng-container>
+    <ng-container *ngIf="variableFieldArray.length > 0">
+        <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort class="table table-striped">
+            <!-- <ng-container matColumnDef="Sl-No.">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Sl No.</th>
+                <td mat-cell *matCellDef="let variableField; index as i">{{row}}</td>
+            </ng-container> -->
+            <ng-container matColumnDef="Column Name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Column Name
+                </th>
+                <td mat-cell *matCellDef="let variableField">{{variableField.columnName}}</td>
+            </ng-container>
+            <ng-container matColumnDef="Column Type">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Column Type
+                </th>
+                <td mat-cell *matCellDef="let variableField">{{variableField.columnType}}</td>
+            </ng-container>
+            <ng-container matColumnDef="Column Index">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Column Index
+                </th>
+                <td mat-cell *matCellDef="let variableField">{{variableField.columnIndex}}</td>
+            </ng-container>
+            <ng-container matColumnDef="Column Length">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Column Length
+                </th>
+                <td mat-cell *matCellDef="let variableField">{{variableField.columnLength}}</td>
+            </ng-container>
+            <ng-container matColumnDef="Mapped Flag">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Mapped Flag
+                </th>
+                <td mat-cell *matCellDef="let variableField">{{variableField.isMapped}}
+                    <ng-container *ngIf="variableField.isMapped == 'True'">
+                        <button mat-button [matMenuTriggerFor]="belowMenu"><i
+                                class="material-icons">keyboard_arrow_down</i></button>
+                        <mat-menu #belowMenu="matMenu" yPosition="below">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Sl No.</th>
+                                        <th>Mapped FileName</th>
+                                        <th>Mapped FileType</th>
+                                        <th>Mapped ColumnName</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1.</td>
+                                        <td>{{variableField.mappedDetails.mappedFilename}}</td>
+                                        <td>{{variableField.mappedDetails.mappedFileType}}</td>
+                                        <td>{{variableField.mappedDetails.mappedFileColumn}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </mat-menu>
+                    </ng-container>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="Actions">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Actions
+                </th>
+                <td mat-cell *matCellDef="let variableField">
+                    <i class="material-icons" style="cursor: pointer; color:green;" (click)="saveVariableDetails()"
+                        *ngIf="editFlag && variableField.columnName == editColumnName">check</i>
+                    <i class="material-icons" style="cursor: pointer; color:blue;"
+                        (click)="editVariableDetails(variableField)" *ngIf="!editFlag">edit</i>
+                    <span class="material-icons" style="cursor: pointer; color: red;" mat-tooltip="Delete Item"
+                        (click)="deleteVariableDetails(variableField.columnName)">cancel</span>
+                </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+    </ng-container>
+    <ng-container *ngIf="this.mappedValueFlag">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Sl No.</th>
+                    <th>Mapped FileName</th>
+                    <th>Mapped FileType</th>
+                    <th>Mapped ColumnName</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1.</td>
+                    <td>{{mappedRecord.mappedFilename}}</td>
+                    <td>{{mappedRecord.mappedFileType}}</td>
+                    <td>{{mappedRecord.mappedFileColumn}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </ng-container>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button *ngIf="mappedFlag" class="btn btn-warning" color="warn" (click)="saveMappedDetails()">Save Mapped
+        Details</button>
+    <button mat-button class="btn btn-success" color="accent" (click)="addMappedDetails(true)"
+        [disabled]="!variableFieldForm.get('isMapped').value">{{mappedButton}}</button>
+    <button mat-button class="btn btn-warning" color="warn" (click)="saveVariableDetails()"
+        *ngIf="!mappedFlag && !editFlag">Save
+        Variable Details</button>
+</mat-dialog-actions>
