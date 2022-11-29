@@ -139,6 +139,7 @@
                         </button>
                     </div>
                     <mat-action-row>
+                        <button mat-button color="success" (click)="onSampleFileUpload()" class="btn btn-success" *ngIf="instructionForm.get('isFileLocal').value && sampleFileUploadFlag">Upload Sample File</button>
                         <button mat-button color="warn" (click)="prevStep()">Previous</button>
                         <button type="submit" mat-button color="danger" (click)="addVariableFields()"
                             *ngIf="inputType === 'Form Input'"

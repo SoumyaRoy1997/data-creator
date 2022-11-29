@@ -21,6 +21,7 @@ export class DashboardComponent implements OnInit {
   sampleFile: File = null;
   inputType = 'Form Input';
   sampleFileData: string = '';
+  sampleFileUploadFlag:boolean=false;
   addVariableFlag = false;
   fileUploaded: boolean = false;
   dashboardForm: FormGroup;
@@ -92,10 +93,9 @@ export class DashboardComponent implements OnInit {
       if (this.instructionForm.valid) {
         console.log(this.instructionForm)
         var isFileLocal = 'False';
-        if (this.instructionForm.get('isFileLocal').value){
-          isFileLocal = 'True';
-          this.onSampleFileUpload();
-          this.instructionForm.get("sampleFilename").setValue('');
+        if (this.instructionForm.get('isFileLocal').value) {
+          isFileLocal = 'False';
+          //this.onSampleFileUpload();
         }
         var sampleFileHeader = 'False';
         if (this.instructionForm.get('sampleFileHeader').value)
@@ -158,6 +158,7 @@ export class DashboardComponent implements OnInit {
   }
   onSampleFileChange(event) {
     this.sampleFile = event.target.files[0];
+    this.sampleFileUploadFlag=true;
   }
 
   onSampleFileUpload() {
@@ -165,9 +166,24 @@ export class DashboardComponent implements OnInit {
     const fileReader = new FileReader();
     fileReader.readAsText(selectedFile, "UTF - 8");
     fileReader.onload = () => {
-      //if (this.instruction.fileType == 'json')
-      this.sampleFileData = (JSON.parse(fileReader.result.toString()));
-      console.log(this.sampleFileData)
+      if (this.instructionForm.get('fileType').value == 'json') {
+        this.sampleFileData = (JSON.parse(fileReader.result.toString()));
+        var request = { "type": "json", "data": this.sampleFileData };
+      }
+      else{
+        this.sampleFileData =fileReader.result.toString();
+        console.log(this.sampleFileData);
+        var request = { "type": "csv", "data": this.sampleFileData };
+      }
+      this.dashboardService.uploadSampleFile(request).subscribe(data => {
+        console.log(data)
+        this.instructionForm.patchValue({
+          isFileLocal:false,
+          fileLocation:data['message']
+        })
+        this.instructionForm.get("isFileLocal").setValue('False');
+        this.instructionForm.get("fileLocation").setValue(data['message'])
+      })
     }
     fileReader.onerror = (error) => {
       console.log(error);

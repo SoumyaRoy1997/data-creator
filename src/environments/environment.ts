@@ -5,6 +5,7 @@
 export const environment = {
   production: false,
   //base_url: 'http://127.0.0.1:8000/dataCreator'
+  base_helper_url:'https://xiq6aevclf-vpce-0138d10bd9c5561c0.execute-api.us-east-1.amazonaws.com/DEV/datacreatorhelper',
   base_url: 'https://jdamcub1xj-vpce-0138d10bd9c5561c0.execute-api.us-east-1.amazonaws.com/dev/datacreator'
 };
 
