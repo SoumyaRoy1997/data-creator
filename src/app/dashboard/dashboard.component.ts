@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import Swal from 'sweetalert2';
 import { AdditionalDetailsComponent } from './additional-details/additional-details.component';
 import { DashboardService } from '../service/dashboard.service';
@@ -8,6 +8,10 @@ import { instructionJson } from '../models/instruction-form'
 import { VariableFieldsComponent } from './variable-fields/variable-fields.component';
 import { ConfirmationWindowComponent } from '../common/confirmation-window/confirmation-window.component';
 import { variableFields } from '../models/variable-fields';
+import { ProgressSpinnerComponent } from '../common/progress-spinner/progress-spinner.component'
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { error } from 'console';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-dashboard',
@@ -16,23 +20,48 @@ import { variableFields } from '../models/variable-fields';
 })
 export class DashboardComponent implements OnInit {
   step = 0;
-  loading: boolean = false;
-  file: File = null;
-  sampleFile: File = null;
   inputType = 'Form Input';
   sampleFileData: string = '';
-  sampleFileUploadFlag:boolean=false;
-  addVariableFlag = false;
-  fileUploaded: boolean = false;
   dashboardForm: FormGroup;
   instructionForm: FormGroup;
   instruction: instructionJson;
   variableRecord: variableFields[] = []
   variableFieldButton = "Add Variable Fields";
+  instanceName = "";
+
+  sampleFileUploadFlag: boolean = false;
+  addVariableFlag = false;
+  fileUploaded: boolean = false;
+  file: File = null;
+  sampleFile: File = null;
 
   constructor(private dashboardService: DashboardService,
     private dialog: MatDialog,
-    private fb: FormBuilder) { }
+    private fb: FormBuilder,
+    public snackBar: MatSnackBar,
+    private httpClient: HttpClient) { }
+
+  ngOnInit(): void {
+    this.dashboardForm = this.fb.group({
+      instanceName: [''],
+      generateloc: [''],
+      instructionInput: ['']
+    });
+    this.instructionForm = this.fb.group({
+      sampleFilename: [''],
+      fileType: ['', Validators.required],
+      fileLocation: ['', Validators.required],
+      outputFolder: ['', Validators.required],
+      outputFilename: ['', Validators.required],
+      folders: ['', Validators.required],
+      files: ['', Validators.required],
+      records: ['', Validators.required],
+      sampleFileHeader: [''],
+      isFileLocal: [''],
+      indent: [''],
+      sparkConfFile: [''],
+    })
+  }
 
   setStep(index: number) {
     this.step = index;
@@ -40,6 +69,7 @@ export class DashboardComponent implements OnInit {
   nextStep() {
     if (this.step == 0) {
       this.inputType = this.dashboardForm.get("instructionInput").value || 'Form Input'
+      this.instanceName = this.dashboardForm.get("instanceName").value || 'Sample'
     }
     if (this.step == 1) {
       if (this.inputType !== "Form Input" && this.fileUploaded) {
@@ -49,16 +79,7 @@ export class DashboardComponent implements OnInit {
         });
         dialogRef.afterClosed().subscribe(result => {
           if (result == 'No') {
-            this.loading = !this.loading;
-            this.dashboardService.postInstructionFile(this.instruction).subscribe(data => {
-              console.log(data);
-              Swal.fire("User", 'Your data generation is Successfull ', 'success');
-              this.loading = false;
-            }, error => {
-              console.log(error);
-              Swal.fire("User", 'Your data generation was not completed ', 'error');
-              this.loading = false;
-            })
+            this.postInstructionFile(this.instruction);
           }
           else {
             this.step = 1;
@@ -91,11 +112,9 @@ export class DashboardComponent implements OnInit {
         });
       }
       if (this.instructionForm.valid) {
-        console.log(this.instructionForm)
         var isFileLocal = 'False';
         if (this.instructionForm.get('isFileLocal').value) {
           isFileLocal = 'False';
-          //this.onSampleFileUpload();
         }
         var sampleFileHeader = 'False';
         if (this.instructionForm.get('sampleFileHeader').value)
@@ -113,52 +132,74 @@ export class DashboardComponent implements OnInit {
           "isFileLocal": isFileLocal,
           "sampleFileHeader": sampleFileHeader
         }
-        console.log(this.instruction);
         if (this.addVariableFlag)
           this.instruction['variableRecords'] = this.variableRecord;
-        this.loading = true;
-        this.dashboardService.postInstructionFile(this.instruction).subscribe(data => {
-          console.log(data);
-          Swal.fire("User", 'Your data generation is Successfull ', 'success');
-          this.loading = false;
-        }, error => {
-          console.log(error);
-          Swal.fire("User", 'Your data generation was not completed ', 'error');
-          this.loading = false;
-        })
+        this.postInstructionFile(this.instruction);
       }
     }
     this.step++;
   }
 
+  postInstructionFile(instructionRequest: instructionJson) {
+    let dialogRef: MatDialogRef<ProgressSpinnerComponent> = this.dialog.open(ProgressSpinnerComponent, {
+      panelClass: 'transparent',
+      disableClose: true
+    });
+    this.dashboardService.postInstructionFile(instructionRequest).subscribe(data => {
+      //Swal.fire("User", 'Your data generation is Successfull!', 'success');
+
+      dialogRef.close();
+      this.instructionForm.reset();
+      this.dashboardForm.reset();
+      this.instructionForm.markAsUntouched();
+      this.dashboardForm.markAsUntouched();
+      this.sampleFileUploadFlag = false;
+      this.addVariableFlag = false;
+      this.fileUploaded = false;
+      this.variableFieldButton = "Add Variable Fields";
+      this.setStep(0);
+      this.file = null;
+      this.sampleFile = null;
+      console.log(data)
+      if (!data['cloudFlag']) {
+        const swalWithBootstrapButtons = Swal.mixin({
+          customClass: {
+            confirmButton: 'btn btn-success',
+            cancelButton: 'btn btn-warning'
+          },
+          buttonsStyling: true,
+        });
+        swalWithBootstrapButtons.fire(
+          {
+            showCloseButton: true,
+            title: 'Download File',
+            text: 'Do you want to download your file?',
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            reverseButtons: false,
+          }
+        ).then((result) => {
+          if (result.value) {
+            window.location.href = data['fileLocation']
+            return;
+          }
+          console.log('cancel');
+        });
+      }
+    }, error => {
+      Swal.fire("User", 'Your data generation was not completed ', 'error');
+      this.setStep(0);
+      dialogRef.close();
+    })
+  }
+
   prevStep() {
     this.step--;
   }
-
-  ngOnInit(): void {
-    this.dashboardForm = this.fb.group({
-      instanceName: ['', Validators.required],
-      generateloc: ['', Validators.required],
-      instructionInput: ['', Validators.required]
-    });
-    this.instructionForm = this.fb.group({
-      sampleFilename: [''],
-      fileType: ['', Validators.required],
-      fileLocation: ['', Validators.required],
-      outputFolder: ['', Validators.required],
-      outputFilename: ['', Validators.required],
-      folders: ['', Validators.required],
-      files: ['', Validators.required],
-      records: ['', Validators.required],
-      sampleFileHeader: [''],
-      isFileLocal: [''],
-      indent: [''],
-      sparkConfFile: [''],
-    })
-  }
   onSampleFileChange(event) {
     this.sampleFile = event.target.files[0];
-    this.sampleFileUploadFlag=true;
+    this.sampleFileUploadFlag = true;
   }
 
   onSampleFileUpload() {
@@ -166,23 +207,34 @@ export class DashboardComponent implements OnInit {
     const fileReader = new FileReader();
     fileReader.readAsText(selectedFile, "UTF - 8");
     fileReader.onload = () => {
+      this.sampleFileUploadFlag = !this.sampleFileUploadFlag
       if (this.instructionForm.get('fileType').value == 'json') {
         this.sampleFileData = (JSON.parse(fileReader.result.toString()));
-        var request = { "type": "json", "data": this.sampleFileData };
+        var request = { "type": "json", "usage": "sample", "data": this.sampleFileData, "filename": "" };
       }
-      else{
-        this.sampleFileData =fileReader.result.toString();
+      else {
+        this.sampleFileData = fileReader.result.toString();
         console.log(this.sampleFileData);
-        var request = { "type": "csv", "data": this.sampleFileData };
+        var request = { "type": "csv", "usage": "sample", "data": this.sampleFileData, "filename": "" };
       }
+      let dialogRef: MatDialogRef<ProgressSpinnerComponent> = this.dialog.open(ProgressSpinnerComponent, {
+        panelClass: 'transparent',
+        disableClose: true
+      });
       this.dashboardService.uploadSampleFile(request).subscribe(data => {
         console.log(data)
         this.instructionForm.patchValue({
-          isFileLocal:false,
-          fileLocation:data['message']
+          isFileLocal: false,
+          fileLocation: data['message']
         })
         this.instructionForm.get("isFileLocal").setValue('False');
         this.instructionForm.get("fileLocation").setValue(data['message'])
+        dialogRef.close();
+        this.snackBar.open("Sample File Uploaded", "Success", {
+          duration: 2000,
+        });
+      }, error => {
+        dialogRef.close();
       })
     }
     fileReader.onerror = (error) => {
@@ -230,7 +282,7 @@ export class DashboardComponent implements OnInit {
   addVariableFields() {
     const dialogRef = this.dialog.open(VariableFieldsComponent, {
       width: 'auto',
-      data: { "variableRecord": this.variableRecord }
+      data: { "variableRecord": this.variableRecord, "instanceName": this.instanceName }
     });
 
     dialogRef.afterClosed().subscribe(result => {

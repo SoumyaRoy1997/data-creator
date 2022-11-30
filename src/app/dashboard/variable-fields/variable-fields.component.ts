@@ -1,9 +1,12 @@
 import { Component, Inject, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
+import { ProgressSpinnerComponent } from 'src/app/common/progress-spinner/progress-spinner.component';
 import { mappedDetails } from 'src/app/models/mapped-details';
 import { variableFields } from 'src/app/models/variable-fields';
+import { DashboardService } from 'src/app/service/dashboard.service';
 
 @Component({
   selector: 'app-variable-fields',
@@ -25,11 +28,16 @@ export class VariableFieldsComponent implements OnInit {
   editColumnName = "";
   displayedColumns: string[] = ['Column Name', 'Column Type', 'Column Index', 'Column Length', 'Mapped Flag', 'Actions'];
   file: File = null;
-  fileUploaded:boolean=false;
+  fileUploaded: boolean = false;
+  mappedFileData = ''
+  mappedFilename:string="";
 
   constructor(private fb: FormBuilder,
     public dialogRef: MatDialogRef<VariableFieldsComponent>,
-    @Inject(MAT_DIALOG_DATA) public data) { }
+    @Inject(MAT_DIALOG_DATA) public data,
+    private dashboardService: DashboardService,
+    private dialog: MatDialog,
+    public snackBar: MatSnackBar) { }
 
   onNoClick(): void {
     this.dialogRef.close();
@@ -55,8 +63,8 @@ export class VariableFieldsComponent implements OnInit {
       mappedFileHeader: [false],
     })
     // this.variableFieldArray[0].mappedDetails.
-    if(this.data.variableRecord.length > 0){
-      this.variableFieldArray=this.data.variableRecord;
+    if (this.data.variableRecord.length > 0) {
+      this.variableFieldArray = this.data.variableRecord;
       this.dataSource = new MatTableDataSource<variableFields>(this.variableFieldArray);
     }
   }
@@ -79,7 +87,7 @@ export class VariableFieldsComponent implements OnInit {
       var mappedFileHeader = "False"
     this.mappedRecord = {
       "mappedFileColumn": this.mappedDetailsForm.get("mappedFileColumn").value || "",
-      "mappedFileColumnNum": this.mappedDetailsForm.get("mappedFileColumnNum").value || "",
+      "mappedFileColumnNum": this.mappedDetailsForm.get("mappedFileColumnNum").value,
       "mappedFileDelim": this.mappedDetailsForm.get("mappedFileDelim").value,
       "mappedFileHeader": mappedFileHeader,
       "mappedFileType": this.mappedDetailsForm.get("mappedFileType").value || "",
@@ -91,8 +99,10 @@ export class VariableFieldsComponent implements OnInit {
   }
 
   saveVariableDetails() {
-    if (this.editFlag)
+    if (this.editFlag){
+      this.saveMappedDetails();
       this.editFlag = false;
+    }
     if (this.variableFieldForm.get("isMapped").value) {
       this.variableRecord = {
         "columnType": this.variableFieldForm.get("columnType").value || "",
@@ -124,13 +134,15 @@ export class VariableFieldsComponent implements OnInit {
   editVariableDetails(variableRecord: variableFields) {
     this.editFlag = !this.editFlag;
     this.editColumnName = variableRecord.columnName;
-    this.mappedRecord=variableRecord.mappedDetails;
+    this.mappedRecord = variableRecord.mappedDetails;
     if (variableRecord.isMapped == "True") {
       this.addMappedDetails(false);
       this.mappedValueFlag = true;
       var mappedFileHeader = false
       if (variableRecord.mappedDetails.mappedFileHeader == "True")
         mappedFileHeader = true
+      if(variableRecord.mappedDetails.mappedFilename.includes('s3://'))
+        this.mappedDetailsForm.patchValue({fileLocalCheck:false})
       this.mappedDetailsForm.patchValue({
         mappedFileColumn: variableRecord.mappedDetails.mappedFileColumn,
         mappedFileColumnNum: variableRecord.mappedDetails.mappedFileColumnNum,
@@ -160,19 +172,43 @@ export class VariableFieldsComponent implements OnInit {
 
   onChange(event) {
     this.file = event.target.files[0];
+    this.mappedFilename=this.file.name;
+    this.fileUploaded=true;
   }
-  onUpload(event,type:string) {
-    this.file = event.target.files[0];
+  onUpload(event, type: string) {
     var selectedFile = this.file;
     const fileReader = new FileReader();
     fileReader.readAsText(selectedFile, "UTF - 8");
+    var fileSuffix=this.variableFieldForm.get('columnName').value || this.mappedDetailsForm.get('mappedFileColumn').value
     fileReader.onload = () => {
-     if(type == "Mapping"){
-       
-     }
-     else{
-
-     }
+      this.fileUploaded=false;
+      if (this.mappedDetailsForm.get('mappedFileType').value == 'json') {
+        this.mappedFileData = (JSON.parse(fileReader.result.toString()));
+        var request = { "type": "json", "usage":"mapping","data": this.mappedFileData ,"filename":this.mappedFilename.replace(".","-"+fileSuffix+".")};
+      }
+      else {
+        this.mappedFileData = fileReader.result.toString();
+        var request = { "type": "csv", "usage":"mapping","data": this.mappedFileData ,"filename":this.mappedFilename.replace(".","-"+fileSuffix+".")};
+      }
+      let dialogRef: MatDialogRef<ProgressSpinnerComponent> = this.dialog.open(ProgressSpinnerComponent, {
+        panelClass: 'transparent',
+        disableClose: true
+      });
+      this.dashboardService.uploadSampleFile(request).subscribe(data => {
+        console.log(data)
+        this.variableFieldForm.patchValue({
+          isFileLocal: false,
+          fileLocation: data['message']
+        })
+        this.mappedDetailsForm.get("fileLocalCheck").setValue('False');
+        this.mappedDetailsForm.get("mappedFilename").setValue(data['message'])
+        dialogRef.close();
+        this.snackBar.open("Sample File Uploaded", "Success", {
+          duration: 2000,
+        });
+      },error=>{
+        dialogRef.close();
+      })
     }
     fileReader.onerror = (error) => {
       console.log(error);

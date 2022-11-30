@@ -1,10 +1,7 @@
 <div class="container">
     <div class="row">
         <div class="col-md-2"></div>
-        <mat-spinner *ngIf="loading" backdropEnabled="true" positionGloballyCenter="true"></mat-spinner>
-        <div class="ProgressText" style="padding-left: 50%;" *ngIf="loading" backdropEnabled="true"
-            positionGloballyCenter="true">Your data generation is in Progress ......</div>
-        <div class="col-md-8" *ngIf="!loading">
+        <div class="col-md-8" >
             <mat-accordion class="example-headers-align">
                 <mat-expansion-panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle>
                     <form [formGroup]="dashboardForm" (ngSubmit)="nextStep()">
@@ -57,7 +54,9 @@
                         <form [formGroup]="instructionForm">
                             <div class="float-left">
                                 <ng-container *ngIf="instructionForm.get('isFileLocal').value">
+                                    <br>
                                     <mat-label>Upload Sample File</mat-label>
+                                    <br>
                                     <input class="form-control" type="file" (change)="onSampleFileChange($event)"
                                          style="width: 250px;">
                                         <br>

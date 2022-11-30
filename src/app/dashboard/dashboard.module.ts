@@ -7,6 +7,7 @@ import { DashboardRoutingModule } from './dashboard-routing.module';
 import { AdditionalDetailsComponent } from './additional-details/additional-details.component';
 import { VariableFieldsComponent } from './variable-fields/variable-fields.component';
 import { ConfirmationWindowComponent } from '../common/confirmation-window/confirmation-window.component';
+import { ProgressSpinnerComponent } from '../common/progress-spinner/progress-spinner.component';
 
 
 @NgModule({
@@ -14,7 +15,8 @@ import { ConfirmationWindowComponent } from '../common/confirmation-window/confi
         DashboardComponent,
         AdditionalDetailsComponent,
         VariableFieldsComponent,
-        ConfirmationWindowComponent
+        ConfirmationWindowComponent,
+        ProgressSpinnerComponent
     ],
     imports: [
       RouterModule,
