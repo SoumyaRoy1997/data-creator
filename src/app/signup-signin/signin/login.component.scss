@@ -1,4 +1,4 @@
-@import "../common/shared.scss";
+@import "../../common/shared.scss";
   
 mat-label{
   max-width: 400px;
@@ -6,7 +6,11 @@ mat-label{
   text-align: center;
   
 }
-
+@mixin _border($color)
+{
+  border-radius: 25px;
+  border: 2px solid $color;
+}
 mat-card {
  
   display: flex;
@@ -16,7 +20,10 @@ mat-card {
 button:hover {
   opacity: 0.8;
 }
-
+mat-tab-group{
+  @extend mat-label;
+  @include _border(black);
+} 
 /* Extra style for the cancel button (red) */
 .cancelbtn {
   width: auto;

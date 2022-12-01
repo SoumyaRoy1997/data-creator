@@ -1,0 +1,15 @@
+@import "../../common/shared.scss";
+
+mat-label{
+    max-width: 400px;
+    margin: 2em auto;
+    text-align: center;
+    
+  }
+  
+  mat-card {
+   
+    display: flex;
+    @extend mat-label;
+    
+  }

@@ -1,0 +1,29 @@
+<mat-card>
+    <mat-card-content>
+        <form [formGroup]="registrationForm">
+            <h2>Registration</h2>
+            <div class="float-right">
+                <mat-form-field appearance="outline">
+                    <mat-label>First Name</mat-label>
+                    <input matInput placeholder="First Name" formControlName="firstName">
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                    <mat-label>Last Name</mat-label>
+                    <input matInput placeholder="Last Name" formControlName="lastName">
+                </mat-form-field>
+            </div>
+            <div class="float-left">
+                <mat-form-field appearance="outline">
+                    <mat-label>Username</mat-label>
+                    <input matInput placeholder="Username" formControlName="username">
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                    <mat-label>Password</mat-label>
+                    <input matInput placeholder="Password" formControlName="password">
+                </mat-form-field>
+            </div>
+
+            <button type="submit" class="btn btn-outline-success" (click)="getRegistration()">Register</button>
+        </form>
+    </mat-card-content>
+</mat-card>

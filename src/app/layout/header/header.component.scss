@@ -1,7 +1,102 @@
-.header {
-    padding: 60px;
-    text-align: center;
-    background: black;
-    color: white;
-    font-size: 30px;
+@import "../../common/shared.scss";
+
+$myColor: transparent;
+
+.mat-toolbar{
+  overflow: hidden;
+  background-color: #f1f1f1;
+  padding: 20px 10px;
+}
+
+/* Style the header links */
+.mat-toolbar a {
+  float: left;
+  color: rgb(239, 224, 224);
+  text-align: center;
+  padding: 12px;
+  text-decoration: none;
+  font-size: 18px;
+  line-height: 20px;
+  border-radius: 2px;
+  border-color: #f1f1f1;
+}
+
+.mat-toolbar button {
+  float: left;
+  text-align: center;
+  padding: 12px;
+  text-decoration: none;
+  font-size: 10px;
+  line-height: 25px;
+  border-radius: 4px;
+  border-color: #f1f1f1;
+}
+
+/* Style the logo link (notice that we set the same value of line-height and font-size to prevent the header to increase when the font gets bigger */
+.mat-toolbar a.logo {
+  font: {
+    size: 25px;
+    weight: bold;
   }
+}
+
+/* Change the background color on mouse-over */
+.mat-toolbar a:hover {
+  background-color: $color;
+  color: black;
+}
+.example-spacer {
+  flex: 1 1 auto;
+}
+.mat-toolbar a.active {
+  background-color: dodgerblue;
+  color: white;
+}
+
+.example-container {
+  position: absolute;
+  @include _margin(60px,60px,0,0);
+}
+
+.example-sidenav {
+  align-items: center;
+  justify-content: center;
+  width: 200px;
+  background: rgba(255, 0, 0, 0.5);
+  display: block;
+  flex-direction: initial;
+  position: absolute;
+  @include _margin(64px,0,0,0);
+}
+.mat-sidenav-container
+{
+  // background-image: url($imageUrlHeader);
+  @include _backGroundImage();
+}
+.mat-sidenav
+{
+  background-color: $myColor;
+}
+.mat-list-item:hover
+{
+  background-color: seashell;
+}
+
+@media screen and (max-width: 800px) {
+  .mat-toolbar a {
+    float: none;
+    display: block;
+    text-align: left;
+  }
+  .header-right {
+    float: none;
+  }
+  .mat-sidenav
+{
+  background-color: $myColor;
+}
+.mat-list-item:hover
+{
+  background-color: seashell;
+}
+}

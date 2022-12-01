@@ -1,7 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import Swal from 'sweetalert2';
-import { AdditionalDetailsComponent } from './additional-details/additional-details.component';
 import { DashboardService } from '../service/dashboard.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { instructionJson } from '../models/instruction-form'
@@ -10,8 +9,9 @@ import { ConfirmationWindowComponent } from '../common/confirmation-window/confi
 import { variableFields } from '../models/variable-fields';
 import { ProgressSpinnerComponent } from '../common/progress-spinner/progress-spinner.component'
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { error } from 'console';
 import { HttpClient } from '@angular/common/http';
+import { LoginService } from '../service/login.service';
+import { registration } from '../models/registration-form';
 
 @Component({
   selector: 'app-dashboard',
@@ -28,20 +28,25 @@ export class DashboardComponent implements OnInit {
   variableRecord: variableFields[] = []
   variableFieldButton = "Add Variable Fields";
   instanceName = "";
-
+  username: string = ''
   sampleFileUploadFlag: boolean = false;
   addVariableFlag = false;
   fileUploaded: boolean = false;
   file: File = null;
   sampleFile: File = null;
 
+  @ViewChild('instructionInput') myInputVariable: ElementRef<HTMLInputElement>;
+  @ViewChild('sampleFileInput') sampleInputVariable: ElementRef<HTMLInputElement>;
+
   constructor(private dashboardService: DashboardService,
+    private loginService: LoginService,
     private dialog: MatDialog,
     private fb: FormBuilder,
     public snackBar: MatSnackBar,
     private httpClient: HttpClient) { }
 
   ngOnInit(): void {
+    this.username = JSON.parse(localStorage.getItem('currentUser'))['username']
     this.dashboardForm = this.fb.group({
       instanceName: [''],
       generateloc: [''],
@@ -61,6 +66,7 @@ export class DashboardComponent implements OnInit {
       indent: [''],
       sparkConfFile: [''],
     })
+    this.setStep(0);
   }
 
   setStep(index: number) {
@@ -146,9 +152,8 @@ export class DashboardComponent implements OnInit {
       disableClose: true
     });
     this.dashboardService.postInstructionFile(instructionRequest).subscribe(data => {
-      //Swal.fire("User", 'Your data generation is Successfull!', 'success');
-
-      dialogRef.close();
+      var date = new Date();
+      var userDetails: registration = { "username": this.username, dashboard: [{ "dataGenInstanceName": this.instanceName, "executionDate": date, "instructionfile":JSON.stringify(instructionRequest)}] }
       this.instructionForm.reset();
       this.dashboardForm.reset();
       this.instructionForm.markAsUntouched();
@@ -161,6 +166,10 @@ export class DashboardComponent implements OnInit {
       this.file = null;
       this.sampleFile = null;
       console.log(data)
+      console.log(userDetails);
+      //var executionDate = this.datepipe.transform(date, 'yyyy-MM-dd');
+      this.loginService.editProfile(userDetails).subscribe(data=>{console.log(data)})
+      dialogRef.close();
       if (!data['cloudFlag']) {
         const swalWithBootstrapButtons = Swal.mixin({
           customClass: {
@@ -187,6 +196,10 @@ export class DashboardComponent implements OnInit {
           console.log('cancel');
         });
       }
+      else {
+        Swal.fire("User", 'Your data generation was completed Successfully! ', 'success');
+      }
+
     }, error => {
       Swal.fire("User", 'Your data generation was not completed ', 'error');
       this.setStep(0);
@@ -208,6 +221,7 @@ export class DashboardComponent implements OnInit {
     fileReader.readAsText(selectedFile, "UTF - 8");
     fileReader.onload = () => {
       this.sampleFileUploadFlag = !this.sampleFileUploadFlag
+      this.sampleInputVariable.nativeElement.value = null
       if (this.instructionForm.get('fileType').value == 'json') {
         this.sampleFileData = (JSON.parse(fileReader.result.toString()));
         var request = { "type": "json", "usage": "sample", "data": this.sampleFileData, "filename": "" };
@@ -222,7 +236,6 @@ export class DashboardComponent implements OnInit {
         disableClose: true
       });
       this.dashboardService.uploadSampleFile(request).subscribe(data => {
-        console.log(data)
         this.instructionForm.patchValue({
           isFileLocal: false,
           fileLocation: data['message']
@@ -247,32 +260,13 @@ export class DashboardComponent implements OnInit {
   }
   onUpload(event: Event) {
     var selectedFile = this.file;
-    console.log(this.fileUploaded);
     const fileReader = new FileReader();
     fileReader.readAsText(selectedFile, "UTF - 8");
     fileReader.onload = () => {
-      this.instruction = (JSON.parse(fileReader.result.toString()));
-      console.log(this.instruction);
       this.fileUploaded = true;
-      console.log(this.fileUploaded);
+      this.instruction = (JSON.parse(fileReader.result.toString()));
+      this.myInputVariable.nativeElement.value = ""
       this.nextStep();
-      // this.instruction.sampleFileHeader = 'False'
-      // this.instruction.isFileLocal= 'False'
-      // if (this.instruction.sampleFileHeader == 'True')
-      //   this.instruction.sampleFileHeader = 'True'
-      // if (this.instruction.isFileLocal == 'True')
-      //   this.instruction.isFileLocal = 'True'
-      // this.instruction.variableRecords.forEach(element => {
-      //   if (element.isMapped == 'True') {
-      //     element.isMapped = 'True'
-      //     if (element.mappedDetails.mappedFileHeader)
-      //       element.mappedDetails.mappedFileHeader = 'True'
-      //     else
-      //       element.mappedDetails.mappedFileHeader = 'False'
-      //   }
-      //   else
-      //     element.isMapped = 'False'
-      // });
     }
     fileReader.onerror = (error) => {
       console.log(error);

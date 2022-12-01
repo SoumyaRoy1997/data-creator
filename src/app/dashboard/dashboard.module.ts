@@ -4,19 +4,21 @@ import { SharedModule } from '../common/shared.module';
 import { AuthenticationService } from '../service/authentication.service';
 import { DashboardComponent } from '../dashboard/dashboard.component'
 import { DashboardRoutingModule } from './dashboard-routing.module';
-import { AdditionalDetailsComponent } from './additional-details/additional-details.component';
 import { VariableFieldsComponent } from './variable-fields/variable-fields.component';
 import { ConfirmationWindowComponent } from '../common/confirmation-window/confirmation-window.component';
 import { ProgressSpinnerComponent } from '../common/progress-spinner/progress-spinner.component';
+import { UserDashboardComponent } from './user-dashboard/user-dashboard.component';
+import { InstructionFormComponent } from './instruction-form/instruction-form.component';
 
 
 @NgModule({
     declarations: [
         DashboardComponent,
-        AdditionalDetailsComponent,
         VariableFieldsComponent,
         ConfirmationWindowComponent,
-        ProgressSpinnerComponent
+        ProgressSpinnerComponent,
+        UserDashboardComponent,
+        InstructionFormComponent
     ],
     imports: [
       RouterModule,
@@ -25,7 +27,6 @@ import { ProgressSpinnerComponent } from '../common/progress-spinner/progress-sp
     ],
   exports: [
     DashboardComponent,
-    AdditionalDetailsComponent,
     VariableFieldsComponent,
     SharedModule
   ],

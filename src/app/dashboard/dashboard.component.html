@@ -57,7 +57,7 @@
                                     <br>
                                     <mat-label>Upload Sample File</mat-label>
                                     <br>
-                                    <input class="form-control" type="file" (change)="onSampleFileChange($event)"
+                                    <input class="form-control" #sampleFileInput type="file" (change)="onSampleFileChange($event)"
                                          style="width: 250px;">
                                         <br>
                                     <!-- <button (click)="onUpload($event,'Mapping')" class="btn btn-success">
@@ -131,7 +131,7 @@
                         </form>
                     </div>
                     <div class="text-center" *ngIf="inputType === 'Upload File'">
-                        <input class="form-control" type="file" (change)="onChange($event)">
+                        <input #instructionInput class="form-control" type="file" (change)="onChange($event)">
                         <br>
                         <button (click)="onUpload($event)" class="btn btn-success">
                             Upload
