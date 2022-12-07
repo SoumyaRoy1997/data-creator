@@ -1,0 +1,32 @@
+<form [formGroup]="instructionForm">
+    <div class="container">
+    <div class="row">
+    <div class="col-md-4">
+        <mat-form-field appearance="outline">
+            <mat-label>File Type</mat-label>
+            <mat-select formControlName="fileType">
+                <mat-option *ngFor="let fileTypes of fileTypeList" [value]="fileTypes.value">{{fileTypes.fileType}}</mat-option>
+                <!-- <mat-option value="csv">CSV</mat-option>
+                <mat-option value="json">JSON</mat-option>
+                <mat-option value="PNR">PNR</mat-option>
+                <mat-option value="PARQUET">PARQUET</mat-option>
+                <mat-option value="ORC">ORC</mat-option>
+                <mat-option value="XLSX">XLSX</mat-option>
+                <mat-option value="XML">XML</mat-option> -->
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div class="col-md-4">
+        <mat-slide-toggle formControlName="isFileLocal" [disabled]="instructionForm.get('fileType').value == 'pnr'">
+            Is Sample File in Local Directory?
+        </mat-slide-toggle>
+    </div>
+    <div class="col-md-4">
+        <mat-radio-group aria-label="Where do you want your Output?" #outputFolder placeholder="Output Folder"
+        formControlName="downloadFile">
+        <mat-radio-button value="Download">Download Output</mat-radio-button>
+    </mat-radio-group>
+    </div>
+    </div>
+</div>
+</form>

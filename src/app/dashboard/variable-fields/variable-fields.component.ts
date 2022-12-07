@@ -31,6 +31,15 @@ export class VariableFieldsComponent implements OnInit {
   fileUploaded: boolean = false;
   mappedFileData = ''
   mappedFilename:string="";
+  fileTypeList=[{'fileType':"CSV","value":"csv"},
+                {'fileType':"JSON","value":"json"}]
+
+  columnTypes=[{'columnType':"ALPHANUMERIC","value":"alphanumeric"},
+               {'columnType':"TEXT","value":"text"},
+               {'columnType':"NUMBER","value":"number"},
+               {'columnType':"DATE","value":"date"},
+               {'columnType':"NUMERIC-TEXT","value":"numeric-text"},
+               {'columnType':"EMAIL","value":"email"}]
 
   constructor(private fb: FormBuilder,
     public dialogRef: MatDialogRef<VariableFieldsComponent>,
@@ -50,6 +59,11 @@ export class VariableFieldsComponent implements OnInit {
       columnIndex: [''],
       columnLength: [''],
       domain: [''],
+      dateFormat:[''],
+      startDate:[''],
+      decrement:[''],
+      increment:[''],
+      dateChange:[''],
       isMapped: [false, Validators.required]
     })
 
@@ -66,6 +80,10 @@ export class VariableFieldsComponent implements OnInit {
     if (this.data.variableRecord.length > 0) {
       this.variableFieldArray = this.data.variableRecord;
       this.dataSource = new MatTableDataSource<variableFields>(this.variableFieldArray);
+    }
+    if(this.data.isDisabled){
+      this.variableFieldForm.disable();
+      this.mappedDetailsForm.disable();
     }
   }
 
@@ -163,6 +181,10 @@ export class VariableFieldsComponent implements OnInit {
       domain: variableRecord.domain,
       isMapped: this.mappedValueFlag,
     });
+    if(this.data.isDisabled){
+      this.variableFieldForm.disable();
+      this.mappedDetailsForm.disable();
+    }
   }
 
   deleteVariableDetails(variableColumnName: string) {

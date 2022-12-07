@@ -12,5 +12,6 @@ export interface instructionJson{
 	indent?:string
 	isFileLocal?:string,
 	sampleFileHeader?:string,
+	delimiter?:string,
     variableRecords?:variableFields[]
 }

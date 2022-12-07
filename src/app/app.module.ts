@@ -14,7 +14,7 @@ import { SideNavService } from './service/side-nav.service';
   declarations: [
     AppComponent,
     HeaderComponent,
-    FooterComponent,
+    FooterComponent
   ],
   imports: [
     BrowserModule,

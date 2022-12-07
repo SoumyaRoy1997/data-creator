@@ -1,0 +1,7 @@
+<div class="text-center" *ngIf="inputType === 'Upload File'">
+    <input #instructionInput class="form-control" type="file" (change)="onChange($event)">
+    <br>
+    <button (click)="onUpload()" class="btn btn-success">
+        Upload
+    </button>
+</div>

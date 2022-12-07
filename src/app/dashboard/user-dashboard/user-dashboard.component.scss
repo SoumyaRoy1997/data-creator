@@ -1,8 +1,29 @@
 @import "../../common/table.scss";
-
+@import "../../common/shared.scss";
 
 .mat-table {
     //height: calc( 100vh - 200px);
     overflow: auto; 
     width: 100%;
+  }
+
+  .mat-card .float-right
+  {
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+      color: cadetblue;
+      float: right;
+  }
+  .float-left
+  {
+      color: burlywood;
+      float: left;
+      
+  }
+
+  .card-container {
+    padding: 10px;
+    color: white;
+    width: 500px;
+    display: flex;
+    justify-content: space-between;
   }

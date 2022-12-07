@@ -1,0 +1,23 @@
+{
+   "sampleFilename":"",
+   "fileType":"csv",
+   "fileLocation":"s3://enci-poc-bucket/sample/temp-sample/PNR_CSV-1670318841576.csv",
+   "outputFolder":"Sample",
+   "outputFilename":"Sample",
+   "folders":"1",
+   "files":"1",
+   "records":"1",
+   "indent":"",
+   "isFileLocal":"False",
+   "sampleFileHeader":"True",
+   "variableRecords":[
+      {
+         "columnType":"alphanumeric",
+         "columnName":"PNR",
+         "columnIndex":"0",
+         "columnLength":"10",
+         "domain":"",
+         "isMapped":"False"
+      }
+   ]
+}

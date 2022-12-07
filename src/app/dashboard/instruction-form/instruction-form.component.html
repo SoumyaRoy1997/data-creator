@@ -1,0 +1,68 @@
+<div *ngIf="actualInputType === 'Upload File'">
+<app-upload-instruction-form (uploadFileEvent)="fileUpload($event)" [inputType]="'Upload File'"></app-upload-instruction-form>
+</div>
+<div *ngIf="actualInputType === 'Form Input'">
+    <form [formGroup]="instructionForm">
+        <div class="float-left">
+            <ng-container *ngIf="instructionForm.get('isFileLocal').value">
+                <br>
+                <mat-label>Upload Sample File</mat-label>
+                <br>
+                <input class="form-control" #sampleFileInput type="file" (change)="onSampleFileChange($event)"
+                     style="width: 250px;">
+                    <br>
+                </ng-container>
+            <mat-form-field appearance="outline" *ngIf="!instructionForm.get('isFileLocal').value">
+                <mat-label>File Location</mat-label>
+                <input matInput #fileLocation placeholder="fileLocation"
+                    formControlName="fileLocation">
+            </mat-form-field>
+            <mat-divider *ngIf="this.instructionForm.get('fileType').value == 'csv'"></mat-divider>
+            <mat-form-field appearance="outline" *ngIf="this.instructionForm.get('fileType').value  == 'csv'">
+                <mat-label>File Delimiter</mat-label>
+                <input matInput #Delimiter placeholder="Delimiter" formControlName="delimiter">
+            </mat-form-field>
+            <mat-divider *ngIf="!this.instructionForm.get('downloadFile').value"></mat-divider>
+            <mat-form-field appearance="outline" *ngIf="!this.instructionForm.get('downloadFile').value">
+                <mat-label>Output Folder</mat-label>
+                <input matInput #outputFolder placeholder="outputFolder"
+                    formControlName="outputFolder">
+            </mat-form-field>
+            <mat-divider *ngIf="this.instructionForm.get('fileType').value  == 'orc' || this.instructionForm.get('fileType').value  == 'parquet'"></mat-divider>
+            <mat-form-field appearance="outline" *ngIf="this.instructionForm.get('fileType').value  == 'orc' || this.instructionForm.get('fileType').value  == 'parquet'">
+                <mat-label>Spark Config File</mat-label>
+                <input matInput #sparkConfFile placeholder="sparkConfFile"
+                    formControlName="sparkConfFile">
+            </mat-form-field>
+            <mat-divider *ngIf="this.instructionForm.get('fileType').value  == 'json'"></mat-divider>
+            <mat-form-field appearance="outline" *ngIf="this.instructionForm.get('fileType').value  == 'json'">
+                <mat-label>Indentation</mat-label>
+                <input matInput #indent placeholder="indent" formControlName="indent">
+            </mat-form-field>
+            <mat-divider *ngIf="fileLocationFlag"></mat-divider>
+            <mat-slide-toggle formControlName="isFileLocal" *ngIf="fileLocationFlag">
+                Is File in Local Directory?
+            </mat-slide-toggle>
+        </div>
+        <div class="float-right ">
+            <mat-form-field appearance="outline">
+                <mat-label>How many Records do you need?</mat-label>
+                <input matInput #records placeholder="records" formControlName="records">
+            </mat-form-field>
+            <mat-divider></mat-divider>
+            <mat-form-field appearance="outline">
+                <mat-label>How many Files do you need?</mat-label>
+                <input matInput #files placeholder="files" formControlName="files">
+            </mat-form-field>
+            <mat-divider></mat-divider>
+            <mat-form-field appearance="outline">
+                <mat-label>How many Folders do you need?</mat-label>
+                <input matInput #folders placeholder="folders" formControlName="folders">
+            </mat-form-field>
+            <mat-divider *ngIf="this.instructionForm.get('fileType').value  == 'csv'"></mat-divider>
+            <mat-slide-toggle formControlName="sampleFileHeader" *ngIf="this.instructionForm.get('fileType').value  == 'csv'">
+                File Header
+            </mat-slide-toggle>
+        </div>
+    </form>
+</div>

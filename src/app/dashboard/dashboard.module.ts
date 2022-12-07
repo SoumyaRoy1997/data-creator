@@ -9,6 +9,8 @@ import { ConfirmationWindowComponent } from '../common/confirmation-window/confi
 import { ProgressSpinnerComponent } from '../common/progress-spinner/progress-spinner.component';
 import { UserDashboardComponent } from './user-dashboard/user-dashboard.component';
 import { InstructionFormComponent } from './instruction-form/instruction-form.component';
+import { InstructionPrimaryFormComponent } from './instruction-form/instruction-primary-form/instruction-primary-form.component';
+import { UploadInstructionFormComponent } from './instruction-form/upload-instruction-form/upload-instruction-form.component';
 
 
 @NgModule({
@@ -18,7 +20,9 @@ import { InstructionFormComponent } from './instruction-form/instruction-form.co
         ConfirmationWindowComponent,
         ProgressSpinnerComponent,
         UserDashboardComponent,
-        InstructionFormComponent
+        InstructionFormComponent,
+        InstructionPrimaryFormComponent,
+        UploadInstructionFormComponent
     ],
     imports: [
       RouterModule,

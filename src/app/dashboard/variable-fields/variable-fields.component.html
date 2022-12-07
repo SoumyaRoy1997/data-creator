@@ -17,7 +17,20 @@
             <mat-divider></mat-divider>
             <mat-form-field appearance="outline">
                 <mat-label>Column Type</mat-label>
-                <input matInput #columnType placeholder="Column Type" formControlName="columnType">
+                <mat-select formControlName="columnType">
+                    <mat-option *ngFor="let columnType of columnTypes" [value]="columnType.value">
+                        {{columnType.columnType}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-divider></mat-divider>
+            <mat-form-field appearance="outline" *ngIf="variableFieldForm.get('columnType').value == 'date'">
+                <mat-label>Date Format</mat-label>
+                <input matInput placeholder="Date Format" formControlName="dateFormat">
+            </mat-form-field>
+            <mat-divider></mat-divider>
+            <mat-form-field appearance="outline" *ngIf="variableFieldForm.get('columnType').value == 'date'">
+                <mat-label>Start Date</mat-label>
+                <input matInput placeholder="Start Date" formControlName="startDate">
             </mat-form-field>
             <mat-divider></mat-divider>
         </div>
@@ -27,14 +40,30 @@
                 <input matInput #columnIndex placeholder="Column Index" formControlName="columnIndex">
             </mat-form-field>
             <mat-divider></mat-divider>
-            <mat-form-field appearance="outline">
+            <mat-form-field appearance="outline" *ngIf="variableFieldForm.get('columnType').value != 'date'">
                 <mat-label>Column Length</mat-label>
                 <input matInput #columnLength placeholder="Column Length" formControlName="columnLength">
             </mat-form-field>
+            <mat-form-field appearance="outline" *ngIf="variableFieldForm.get('columnType').value == 'date'">
+                <mat-label>Date Change</mat-label>
+                <input matInput placeholder="Date Change" formControlName="dateChange">
+            </mat-form-field>
+            <mat-divider></mat-divider>
+            <!-- <mat-form-field appearance="outline" *ngIf="variableFieldForm.get('columnType').value == 'date'"> -->
+                <!-- <mat-label *ngIf="variableFieldForm.get('columnType').value == 'date'">Decrement</mat-label> -->
+                <mat-checkbox formControlName="decrement" *ngIf="variableFieldForm.get('columnType').value == 'date'">Decrement</mat-checkbox>
+                <!-- <input matInput #domain placeholder="Decrement" formControlName="decrement"> -->
+            <!-- </mat-form-field> -->
+            <mat-divider></mat-divider>
+            <!-- <mat-form-field appearance="outline" *ngIf="variableFieldForm.get('columnType').value == 'date'">
+                <mat-label>Increment</mat-label>
+                <input matInput placeholder="Increment" formControlName="increment">
+            </mat-form-field> -->
+            <mat-checkbox formControlName="increment" *ngIf="variableFieldForm.get('columnType').value == 'date'">Increment</mat-checkbox>
             <mat-divider></mat-divider>
         </div>
         <div>
-            <mat-form-field appearance="outline">
+            <mat-form-field appearance="outline" *ngIf="variableFieldForm.get('columnType').value == 'email'">
                 <mat-label>Domain</mat-label>
                 <input matInput #domain placeholder="Domain" formControlName="domain">
             </mat-form-field>
@@ -63,7 +92,10 @@
                 <mat-divider></mat-divider>
                 <mat-form-field appearance="outline">
                     <mat-label>Mapped File Type</mat-label>
-                    <input matInput #mappedFileType placeholder="Mapped File Type" formControlName="mappedFileType">
+                    <mat-select formControlName="mappedFileType">
+                        <mat-option *ngFor="let fileTypes of fileTypeList" [value]="fileTypes.value">
+                            {{fileTypes.fileType}}</mat-option>
+                    </mat-select>
                 </mat-form-field>
                 <mat-divider></mat-divider>
                 <mat-form-field appearance="outline">
@@ -183,7 +215,8 @@
     </ng-container>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-    <button mat-button color="success" (click)="onUpload()" class="btn btn-success" *ngIf="!mappedDetailsForm.get('fileLocalCheck').value && fileUploaded">Upload Mapping File</button>
+    <button mat-button color="success" (click)="onUpload()" class="btn btn-success"
+        *ngIf="!mappedDetailsForm.get('fileLocalCheck').value && fileUploaded">Upload Mapping File</button>
     <button mat-button *ngIf="mappedFlag" class="btn btn-warning" color="warn" (click)="saveMappedDetails()">Save Mapped
         Details</button>
     <button mat-button class="btn btn-success" color="accent" (click)="addMappedDetails(true)"

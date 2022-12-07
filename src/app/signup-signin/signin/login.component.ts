@@ -54,7 +54,6 @@ export class LoginComponent implements OnInit {
     });
     this.loginservice.getLogin(loginRequest).subscribe(data=>{
       dialogRef.close();
-      console.log(data);
       this.userDetails=data;
       loginRequest['password']='';
       this.authService.login(loginRequest);
