@@ -31,7 +31,7 @@ export class UserDashboardComponent implements OnInit,AfterViewInit {
   variableRecord: variableFields[] = []
   variableFieldButton = "Add Variable Fields";
   addVariableFlag = false;
-  cardHeader='Edit Instruction for Data Generation Instance'
+  formHeading='Edit Instruction for Data Generation Instance'
   currentTestName=''
   currentTestTime:Date;
   isDisabled:boolean=false;
@@ -115,7 +115,7 @@ export class UserDashboardComponent implements OnInit,AfterViewInit {
     }
     if(disabledFlag){
       this.variableFieldButton = "Show Variable Details";
-      this.cardHeader="Read only details for Data Generation Instance"
+      this.formHeading="Read only details for Data Generation Instance"
       this.instructionForm.disable()
       this.isDisabled=true;
     }
