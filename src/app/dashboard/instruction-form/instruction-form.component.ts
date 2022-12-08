@@ -43,10 +43,10 @@ export class InstructionFormComponent implements OnInit {
   @Input() fileLocationFlag: boolean = false;
   subscription: Subscription;
   @Output() showFormEvent = new EventEmitter<boolean>();
-  @Input() formHeading:string;
-  @Input() currentTestTime:Date;
-  @Input() currentTestName:string;
-  variableRecordDataSource:any;
+  @Input() formHeading: string;
+  @Input() currentTestTime: Date;
+  @Input() currentTestName: string;
+  variableRecordDataSource: any;
 
   fileTypeList = [{ 'fileType': "CSV", "value": "csv" },
   { 'fileType': "JSON", "value": "json" },
@@ -91,32 +91,36 @@ export class InstructionFormComponent implements OnInit {
     this.nextStep();
   }
   nextStep() {
-      this.instructionForm.get('inputType').setValue('Form Input')
-      var sampleFileHeader = false
-      if (this.instruction.sampleFileHeader == 'True')
-        sampleFileHeader = true;
-      this.instructionForm.patchValue({
-        sampleFilename: this.instruction.sampleFilename,
-        fileType: this.instruction.fileType,
-        fileLocation: this.instruction.fileLocation,
-        outputFolder: this.instruction.outputFolder,
-        //outputFilename: this.instruction.outputFilename,
-        folders: this.instruction.folders,
-        files: this.instruction.files,
-        records: this.instruction.records,
-        indent: this.instruction.indent,
-        delimiter: this.instruction.delimiter,
-        isFileLocal: this.instruction.isFileLocal,
-        sampleFileHeader: sampleFileHeader,
-        downloadFile: this.instruction.downloadFile
-      })
-      if (this.instruction['variableRecords'] != null || this.instruction['variableRecords'] != undefined) {
-        this.variableFieldButton = "Edit Variable Details";
-        this.addVariableFlag = true;
-        this.variableRecord = this.instruction['variableRecords'];
-        console.log(this.variableRecord)
-        this.variableRecordDataSource = new MatTableDataSource<variableFields>(this.variableRecord);
-      }
+    console.log(this.instruction)
+    this.instructionForm.get('inputType').setValue('Form Input')
+    var sampleFileHeader = false
+    if (this.instruction.sampleFileHeader == 'True')
+      sampleFileHeader = true;
+    if (this.instructionForm.get('downloadFile').value == 'True') {
+      this.instruction.outputFolder = this.instruction.outputFilename || this.instanceName;
+    }
+    this.instructionForm.patchValue({
+      sampleFilename: this.instruction.sampleFilename,
+      fileType: this.instruction.fileType,
+      fileLocation: this.instruction.fileLocation,
+      outputFolder: this.instruction.outputFolder,
+      //outputFilename: this.instruction.outputFilename,
+      folders: this.instruction.folders,
+      files: this.instruction.files,
+      records: this.instruction.records,
+      indent: this.instruction.indent,
+      delimiter: this.instruction.delimiter,
+      isFileLocal: this.instruction.isFileLocal,
+      sampleFileHeader: sampleFileHeader,
+      downloadFile: this.instruction.downloadFile
+    })
+    if (this.instruction['variableRecords'] != null || this.instruction['variableRecords'] != undefined) {
+      this.variableFieldButton = "Edit Variable Details";
+      this.addVariableFlag = true;
+      this.variableRecord = this.instruction['variableRecords'];
+      console.log(this.variableRecord)
+      this.variableRecordDataSource = new MatTableDataSource<variableFields>(this.variableRecord);
+    }
   }
 
   postInstructionFile(instructionRequest: instructionJson) {
@@ -137,7 +141,6 @@ export class InstructionFormComponent implements OnInit {
       this.variableFieldButton = "Add Variable Fields";
       this.file = null;
       this.sampleFile = null;
-      console.log(data)
       this.loginService.editProfile(userDetails).subscribe(data => {
         var dashboardDetails: dashboard[] = JSON.parse(localStorage.getItem('dashboard'))
         dashboardDetails.push(dashboardRequest)
@@ -209,7 +212,7 @@ export class InstructionFormComponent implements OnInit {
       });
       this.dashboardService.uploadSampleFile(request).subscribe(data => {
         this.instructionForm.patchValue({
-          isFileLocal: false,
+          isFileLocal: 'False',
           fileLocation: data['message']
         })
         this.instructionForm.get("isFileLocal").setValue('False');
@@ -257,7 +260,7 @@ export class InstructionFormComponent implements OnInit {
         this.variableFieldButton = "Edit Variable Details";
         this.addVariableFlag = true;
         var isFileLocal = 'False';
-        if (this.instructionForm.get('isFileLocal').value)
+        if (this.instructionForm.get('isFileLocal').value == 'True')
           isFileLocal = 'True';
         var sampleFileHeader = 'False';
         if (this.instructionForm.get('sampleFileHeader').value)
@@ -276,7 +279,7 @@ export class InstructionFormComponent implements OnInit {
           "delimiter": this.instructionForm.get('delimiter').value,
           "sampleFileHeader": sampleFileHeader,
           "variableRecords": this.variableRecord,
-          "downloadFile":this.instructionForm.get('downloadFile').value
+          "downloadFile": this.instructionForm.get('downloadFile').value
         }
       }
       else
@@ -295,6 +298,9 @@ export class InstructionFormComponent implements OnInit {
       var sampleFileHeader = 'False';
       if (this.instructionForm.get('sampleFileHeader').value)
         sampleFileHeader = 'True';
+      if (this.instructionForm.get('downloadFile').value == 'True') {
+        this.instructionForm.get("outputFolder").setValue(this.instructionForm.get("outputFilename").value || this.instanceName);
+      }
       this.instruction = {
         "sampleFilename": this.instructionForm.get("sampleFilename").value,
         "fileType": this.instructionForm.get("fileType").value,
