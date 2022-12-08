@@ -69,51 +69,7 @@
                 <mat-divider></mat-divider>
                 <mat-divider></mat-divider>
             </div>
-            <h4 style="font-style: italic;font-weight: bold;">Output Configuration</h4>
-            <div>
-                <mat-label>Output Type</mat-label>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <mat-button-toggle-group name="fontStyle" aria-label="Font Style" formControlName="downloadFile">
-                    <mat-button-toggle value="False">S3 Location</mat-button-toggle>
-                    <mat-button-toggle value="True">Local Folder</mat-button-toggle>
-                </mat-button-toggle-group>
-            </div>
-            <div *ngIf="this.instructionForm.get('inputType').value == 'Upload File'">
-                <br>
-                <br>
-                <app-upload-instruction-form (uploadFileEvent)="fileUpload($event)" [inputType]="'Upload File'">
-                </app-upload-instruction-form>
-            </div>
-            <div *ngIf="this.instructionForm.get('inputType').value === 'Form Input'">
-                <div *ngIf="this.instructionForm.get('downloadFile').value == 'False'">
-                    <mat-label>Output Folder</mat-label>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <mat-form-field appearance="outline">
-                        <mat-label>Output Folder</mat-label>
-                        <input matInput #outputFolder placeholder="outputFolder" formControlName="outputFolder">
-                    </mat-form-field>
-                </div>
-                <br>
-                <mat-label>How many Records do you need?</mat-label>
-                &nbsp;&nbsp;
-                <mat-form-field appearance="outline">
-                    <input matInput #records placeholder="Records" formControlName="records">
-                </mat-form-field>
-                <h6 style="font-style: italic;font-weight: bold;">Split the Records into</h6>
-                <mat-label>How many Files do you need?</mat-label>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <mat-form-field appearance="outline">
-                    <input matInput #files placeholder="Files" formControlName="files">
-                </mat-form-field>
-                <br>
-                <mat-label>How many Folders do you need?</mat-label>
-                &nbsp;&nbsp;
-                <mat-form-field appearance="outline">
-                    <input matInput #folders placeholder="Folders" formControlName="folders">
-                </mat-form-field>
-                <mat-divider></mat-divider>
-                <mat-divider></mat-divider>
-                <h4 style="font-style: italic;font-weight: bold;">File Type Configuration</h4>
+            <h4 style="font-style: italic;font-weight: bold;">File Type Configuration</h4>
                 <mat-label>File Type</mat-label>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <mat-form-field appearance="outline">
@@ -157,6 +113,50 @@
                         <input matInput #sparkConfFile placeholder="sparkConfFile" formControlName="sparkConfFile">
                     </mat-form-field>
                 </div>
+                <mat-divider></mat-divider>
+                <mat-divider></mat-divider>
+            <h4 style="font-style: italic;font-weight: bold;">Output Configuration</h4>
+            <div>
+                <mat-label>Output Type</mat-label>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <mat-button-toggle-group name="fontStyle" aria-label="Font Style" formControlName="downloadFile">
+                    <mat-button-toggle value="False">S3 Location</mat-button-toggle>
+                    <mat-button-toggle value="True">Local Folder</mat-button-toggle>
+                </mat-button-toggle-group>
+            </div>
+            <div *ngIf="this.instructionForm.get('inputType').value == 'Upload File'">
+                <br>
+                <br>
+                <app-upload-instruction-form (uploadFileEvent)="fileUpload($event)" [inputType]="'Upload File'">
+                </app-upload-instruction-form>
+            </div>
+            <div *ngIf="this.instructionForm.get('inputType').value === 'Form Input'">
+                <div *ngIf="this.instructionForm.get('downloadFile').value == 'False'">
+                    <mat-label>Output Folder</mat-label>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <mat-form-field appearance="outline">
+                        <mat-label>Output Folder</mat-label>
+                        <input matInput #outputFolder placeholder="outputFolder" formControlName="outputFolder">
+                    </mat-form-field>
+                </div>
+                <br>
+                <mat-label>How many Records do you need?</mat-label>
+                &nbsp;&nbsp;
+                <mat-form-field appearance="outline">
+                    <input matInput #records placeholder="Records" formControlName="records">
+                </mat-form-field>
+                <h6 style="font-style: italic;font-weight: bold;">Split the Records into</h6>
+                <mat-label>How many Files do you need?</mat-label>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <mat-form-field appearance="outline">
+                    <input matInput #files placeholder="Files" formControlName="files">
+                </mat-form-field>
+                <br>
+                <mat-label>How many Folders do you need?</mat-label>
+                &nbsp;&nbsp;
+                <mat-form-field appearance="outline">
+                    <input matInput #folders placeholder="Folders" formControlName="folders">
+                </mat-form-field>
                 <br>
                 <mat-label>Variables</mat-label>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
