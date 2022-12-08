@@ -1,7 +1,7 @@
 <mat-card>
     <mat-card-header>
         <mat-card-title style="font-style: italic;font-weight: bold;font-size: medium;">{{formHeading}}</mat-card-title>
-        <mat-card-subtitle>{{currentTestName}}  {{currentTestTime | date:"MM/dd/yy hh:mm:ss"}}
+        <mat-card-subtitle>{{currentTestName}} {{currentTestTime | date:"MM/dd/yy hh:mm:ss"}}
         </mat-card-subtitle>
     </mat-card-header>
     <mat-card-content class="card-container">
@@ -16,7 +16,8 @@
             <br>
             <mat-label>Configure</mat-label>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <mat-radio-group aria-label="Where do you want your Output?" placeholder="Input Type" formControlName="inputType">
+            <mat-radio-group aria-label="Where do you want your Output?" placeholder="Input Type"
+                formControlName="inputType">
                 <mat-radio-button value="Form Input">Manual</mat-radio-button>
                 &nbsp;&nbsp;
                 <mat-radio-button value="Upload File">Upload Document</mat-radio-button>
@@ -46,12 +47,13 @@
                             </div>
                             <div class="col-md-3" style="padding: 0px;"></div>
                             <div class="col-md-3">
-                            <ng-container *ngIf="sampleFileUploadFlag">
-                                <button type="button" mat-stroked-button color="success" (click)="onSampleFileUpload() && sampleFileUploadFlag=true"
-                            class="btn btn-success" >Upload Sample
-                            File</button>
-                                <!-- <button type="button" mat-stroked-button color="primary">Peek Sample Data</button> -->
-                            </ng-container>
+                                <ng-container *ngIf="sampleFileUploadFlag">
+                                    <button type="button" mat-stroked-button color="success"
+                                        (click)="onSampleFileUpload() && sampleFileUploadFlag=true"
+                                        class="btn btn-success">Upload Sample
+                                        File</button>
+                                    <!-- <button type="button" mat-stroked-button color="primary">Peek Sample Data</button> -->
+                                </ng-container>
                             </div>
                         </div>
                     </div>
@@ -69,13 +71,21 @@
                 <mat-divider></mat-divider>
                 <mat-divider></mat-divider>
             </div>
-            <h4 style="font-style: italic;font-weight: bold;">File Type Configuration</h4>
+            <div *ngIf="this.instructionForm.get('inputType').value == 'Upload File'">
+                <br>
+                <br>
+                <app-upload-instruction-form (uploadFileEvent)="fileUpload($event)" [inputType]="'Upload File'">
+                </app-upload-instruction-form>
+            </div>
+            <div *ngIf="this.instructionForm.get('inputType').value === 'Form Input'">
+                <h4 style="font-style: italic;font-weight: bold;">File Type Configuration</h4>
                 <mat-label>File Type</mat-label>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <mat-form-field appearance="outline">
                     <mat-label>File Type</mat-label>
                     <mat-select formControlName="fileType">
-                        <mat-option *ngFor="let fileTypes of fileTypeList" [value]="fileTypes.value">{{fileTypes.fileType}}
+                        <mat-option *ngFor="let fileTypes of fileTypeList" [value]="fileTypes.value">
+                            {{fileTypes.fileType}}
                         </mat-option>
                     </mat-select>
                 </mat-form-field>
@@ -115,22 +125,15 @@
                 </div>
                 <mat-divider></mat-divider>
                 <mat-divider></mat-divider>
-            <h4 style="font-style: italic;font-weight: bold;">Output Configuration</h4>
-            <div>
-                <mat-label>Output Type</mat-label>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <mat-button-toggle-group name="fontStyle" aria-label="Font Style" formControlName="downloadFile">
-                    <mat-button-toggle value="False">S3 Location</mat-button-toggle>
-                    <mat-button-toggle value="True">Local Folder</mat-button-toggle>
-                </mat-button-toggle-group>
-            </div>
-            <div *ngIf="this.instructionForm.get('inputType').value == 'Upload File'">
-                <br>
-                <br>
-                <app-upload-instruction-form (uploadFileEvent)="fileUpload($event)" [inputType]="'Upload File'">
-                </app-upload-instruction-form>
-            </div>
-            <div *ngIf="this.instructionForm.get('inputType').value === 'Form Input'">
+                <h4 style="font-style: italic;font-weight: bold;">Output Configuration</h4>
+                <div>
+                    <mat-label>Output Type</mat-label>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <mat-button-toggle-group name="fontStyle" aria-label="Font Style" formControlName="downloadFile">
+                        <mat-button-toggle value="False">S3 Location</mat-button-toggle>
+                        <mat-button-toggle value="True">Local Folder</mat-button-toggle>
+                    </mat-button-toggle-group>
+                </div>
                 <div *ngIf="this.instructionForm.get('downloadFile').value == 'False'">
                     <mat-label>Output Folder</mat-label>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -160,7 +163,8 @@
                 <br>
                 <mat-label>Variables</mat-label>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <button type="button" mat-button color="primary" (click)="addVariableFields()">{{variableFieldButton}}</button>
+                <button type="button" mat-button color="primary"
+                    (click)="addVariableFields()">{{variableFieldButton}}</button>
                 <mat-divider></mat-divider>
                 <mat-divider></mat-divider>
                 <br>
