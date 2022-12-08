@@ -28,12 +28,10 @@ export class UploadInstructionFormComponent implements OnInit {
     const fileReader = new FileReader();
     fileReader.readAsText(selectedFile, "UTF - 8");
     fileReader.onload = () => {
-      this.fileUploaded = true;
+      // this.fileUploaded = true;
       this.instruction = (JSON.parse(fileReader.result.toString()));
-      this.myInputVariable.nativeElement.value = ""
-      this.step = 1;
+      //this.myInputVariable.nativeElement.value = ""
       this.uploadFileEvent.emit(this.instruction)
-      console.log(this.instruction)
     }
     fileReader.onerror = (error) => {
       console.log(error);

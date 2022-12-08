@@ -13,5 +13,6 @@ export interface instructionJson{
 	isFileLocal?:string,
 	sampleFileHeader?:string,
 	delimiter?:string,
+	downloadFile?:string,
     variableRecords?:variableFields[]
 }

@@ -60,11 +60,12 @@ export class UserDashboardComponent implements OnInit,AfterViewInit {
       files: ['', Validators.required],
       records: ['', Validators.required],
       sampleFileHeader: [''],
-      isFileLocal: [false],
+      isFileLocal: [''],
       indent: [''],
       delimiter: [''],
       sparkConfFile: [''],
-      downloadFile: [false],
+      downloadFile: [''],
+      inputType: ['']
     })
     this.dashboardList = JSON.parse(localStorage.getItem('dashboard'));
     if (this.dashboardList != null || this.dashboardList != undefined) {
@@ -104,7 +105,8 @@ export class UserDashboardComponent implements OnInit,AfterViewInit {
       records: this.instruction.records,
       indent: this.instruction.indent,
       isFileLocal: isFileLocal,
-      sampleFileHeader: sampleFileHeader
+      sampleFileHeader: sampleFileHeader,
+      inputType:'Form Input'
     })
     if (this.instruction['variableRecords'] != null || this.instruction['variableRecords'] != undefined) {
       this.variableFieldButton = "Edit Variable Details";

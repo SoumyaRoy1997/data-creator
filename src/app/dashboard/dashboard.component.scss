@@ -5,8 +5,11 @@
   
   .mat-form-field {
     margin-top: 16px;
+    width: auto;
   }
-
+  .example-spacer {
+    flex: 1 1 auto;
+  }
   .example-headers-align .mat-expansion-panel-header-title,
   .example-headers-align .mat-expansion-panel-header-description {
     flex-basis: 0;
@@ -63,3 +66,6 @@ input.mat-input {
     vertical-align: bottom;
     text-align: inherit;
 }
+.horizontal-mat-list-item {
+  display: inline;
+  }

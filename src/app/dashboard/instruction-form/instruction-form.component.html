@@ -1,68 +1,246 @@
-<div *ngIf="actualInputType === 'Upload File'">
-<app-upload-instruction-form (uploadFileEvent)="fileUpload($event)" [inputType]="'Upload File'"></app-upload-instruction-form>
-</div>
-<div *ngIf="actualInputType === 'Form Input'">
-    <form [formGroup]="instructionForm">
-        <div class="float-left">
-            <ng-container *ngIf="instructionForm.get('isFileLocal').value">
+<mat-card>
+    <mat-card-header>
+        <mat-card-title style="font-style: italic;font-weight: bold;font-size: medium;">{{formHeading}}</mat-card-title>
+        <mat-card-subtitle>{{currentTestName}}  {{currentTestTime | date:"MM/dd/yy hh:mm:ss"}}
+        </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content class="card-container">
+        <form [formGroup]="instructionForm">
+            <!-- <h4 style="font-style: italic;font-weight: bold;">{{formHeading}} - {{currentTestTime | date:"MM/dd/yy hh:mm:ss"}}</h4> -->
+            <mat-label>Dataset Name</mat-label>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <mat-form-field appearance="outline">
+                <mat-label>Dataset Name</mat-label>
+                <input matInput #outputFilename placeholder="Dataset Name" formControlName="outputFilename">
+            </mat-form-field>
+            <br>
+            <mat-label>Configure</mat-label>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <mat-radio-group aria-label="Where do you want your Output?" placeholder="Input Type" formControlName="inputType">
+                <mat-radio-button value="Form Input">Manual</mat-radio-button>
+                &nbsp;&nbsp;
+                <mat-radio-button value="Upload File">Upload Document</mat-radio-button>
+            </mat-radio-group>
+            <br><br>
+            <mat-divider></mat-divider>
+            <mat-divider></mat-divider>
+            <div *ngIf="this.instructionForm.get('inputType').value === 'Form Input'">
+                <h4 style="font-style: italic;font-weight: bold;">Input Configuration</h4>
+                <mat-label>Input Type</mat-label>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <mat-button-toggle-group name="fontStyle" aria-label="Font Style" formControlName="isFileLocal">
+                    <mat-button-toggle value="False">S3 Location</mat-button-toggle>
+                    <mat-button-toggle value="True">Local Folder</mat-button-toggle>
+                </mat-button-toggle-group>
                 <br>
-                <mat-label>Upload Sample File</mat-label>
                 <br>
-                <input class="form-control" #sampleFileInput type="file" (change)="onSampleFileChange($event)"
-                     style="width: 250px;">
+                <div *ngIf="this.instructionForm.get('isFileLocal').value == 'True'">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-3" style="padding: 0px;">
+                                <mat-label>Upload Sample File</mat-label>
+                            </div>
+                            <div class="col-md-3" style="padding-left: 32px;">
+                                <input #sampleFileInput class="form-control form-control-sm" type="file"
+                                    (change)="onSampleFileChange($event)" style="width: 250px;margin: 0;">
+                            </div>
+                            <div class="col-md-3" style="padding: 0px;"></div>
+                            <div class="col-md-3">
+                            <ng-container *ngIf="sampleFileUploadFlag">
+                                <button type="button" mat-stroked-button color="success" (click)="onSampleFileUpload() && sampleFileUploadFlag=true"
+                            class="btn btn-success" >Upload Sample
+                            File</button>
+                                <!-- <button type="button" mat-stroked-button color="primary">Peek Sample Data</button> -->
+                            </ng-container>
+                            </div>
+                        </div>
+                    </div>
                     <br>
-                </ng-container>
-            <mat-form-field appearance="outline" *ngIf="!instructionForm.get('isFileLocal').value">
-                <mat-label>File Location</mat-label>
-                <input matInput #fileLocation placeholder="fileLocation"
-                    formControlName="fileLocation">
-            </mat-form-field>
-            <mat-divider *ngIf="this.instructionForm.get('fileType').value == 'csv'"></mat-divider>
-            <mat-form-field appearance="outline" *ngIf="this.instructionForm.get('fileType').value  == 'csv'">
-                <mat-label>File Delimiter</mat-label>
-                <input matInput #Delimiter placeholder="Delimiter" formControlName="delimiter">
-            </mat-form-field>
-            <mat-divider *ngIf="!this.instructionForm.get('downloadFile').value"></mat-divider>
-            <mat-form-field appearance="outline" *ngIf="!this.instructionForm.get('downloadFile').value">
-                <mat-label>Output Folder</mat-label>
-                <input matInput #outputFolder placeholder="outputFolder"
-                    formControlName="outputFolder">
-            </mat-form-field>
-            <mat-divider *ngIf="this.instructionForm.get('fileType').value  == 'orc' || this.instructionForm.get('fileType').value  == 'parquet'"></mat-divider>
-            <mat-form-field appearance="outline" *ngIf="this.instructionForm.get('fileType').value  == 'orc' || this.instructionForm.get('fileType').value  == 'parquet'">
-                <mat-label>Spark Config File</mat-label>
-                <input matInput #sparkConfFile placeholder="sparkConfFile"
-                    formControlName="sparkConfFile">
-            </mat-form-field>
-            <mat-divider *ngIf="this.instructionForm.get('fileType').value  == 'json'"></mat-divider>
-            <mat-form-field appearance="outline" *ngIf="this.instructionForm.get('fileType').value  == 'json'">
-                <mat-label>Indentation</mat-label>
-                <input matInput #indent placeholder="indent" formControlName="indent">
-            </mat-form-field>
-            <mat-divider *ngIf="fileLocationFlag"></mat-divider>
-            <mat-slide-toggle formControlName="isFileLocal" *ngIf="fileLocationFlag">
-                Is File in Local Directory?
-            </mat-slide-toggle>
-        </div>
-        <div class="float-right ">
-            <mat-form-field appearance="outline">
+                    <br>
+                </div>
+                <div *ngIf="this.instructionForm.get('isFileLocal').value == 'False'">
+                    <mat-label>File Location</mat-label>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <mat-form-field appearance="outline">
+                        <mat-label>File Location</mat-label>
+                        <input matInput #fileLocation placeholder="fileLocation" formControlName="fileLocation">
+                    </mat-form-field>
+                </div>
+                <mat-divider></mat-divider>
+                <mat-divider></mat-divider>
+            </div>
+            <h4 style="font-style: italic;font-weight: bold;">Output Configuration</h4>
+            <div>
+                <mat-label>Output Type</mat-label>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <mat-button-toggle-group name="fontStyle" aria-label="Font Style" formControlName="downloadFile">
+                    <mat-button-toggle value="False">S3 Location</mat-button-toggle>
+                    <mat-button-toggle value="True">Local Folder</mat-button-toggle>
+                </mat-button-toggle-group>
+            </div>
+            <div *ngIf="this.instructionForm.get('inputType').value == 'Upload File'">
+                <br>
+                <br>
+                <app-upload-instruction-form (uploadFileEvent)="fileUpload($event)" [inputType]="'Upload File'">
+                </app-upload-instruction-form>
+            </div>
+            <div *ngIf="this.instructionForm.get('inputType').value === 'Form Input'">
+                <div *ngIf="this.instructionForm.get('downloadFile').value == 'False'">
+                    <mat-label>Output Folder</mat-label>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <mat-form-field appearance="outline">
+                        <mat-label>Output Folder</mat-label>
+                        <input matInput #outputFolder placeholder="outputFolder" formControlName="outputFolder">
+                    </mat-form-field>
+                </div>
+                <br>
                 <mat-label>How many Records do you need?</mat-label>
-                <input matInput #records placeholder="records" formControlName="records">
-            </mat-form-field>
-            <mat-divider></mat-divider>
-            <mat-form-field appearance="outline">
+                &nbsp;&nbsp;
+                <mat-form-field appearance="outline">
+                    <input matInput #records placeholder="Records" formControlName="records">
+                </mat-form-field>
+                <h6 style="font-style: italic;font-weight: bold;">Split the Records into</h6>
                 <mat-label>How many Files do you need?</mat-label>
-                <input matInput #files placeholder="files" formControlName="files">
-            </mat-form-field>
-            <mat-divider></mat-divider>
-            <mat-form-field appearance="outline">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <mat-form-field appearance="outline">
+                    <input matInput #files placeholder="Files" formControlName="files">
+                </mat-form-field>
+                <br>
                 <mat-label>How many Folders do you need?</mat-label>
-                <input matInput #folders placeholder="folders" formControlName="folders">
-            </mat-form-field>
-            <mat-divider *ngIf="this.instructionForm.get('fileType').value  == 'csv'"></mat-divider>
-            <mat-slide-toggle formControlName="sampleFileHeader" *ngIf="this.instructionForm.get('fileType').value  == 'csv'">
-                File Header
-            </mat-slide-toggle>
-        </div>
-    </form>
-</div>
+                &nbsp;&nbsp;
+                <mat-form-field appearance="outline">
+                    <input matInput #folders placeholder="Folders" formControlName="folders">
+                </mat-form-field>
+                <mat-divider></mat-divider>
+                <mat-divider></mat-divider>
+                <h4 style="font-style: italic;font-weight: bold;">File Type Configuration</h4>
+                <mat-label>File Type</mat-label>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <mat-form-field appearance="outline">
+                    <mat-label>File Type</mat-label>
+                    <mat-select formControlName="fileType">
+                        <mat-option *ngFor="let fileTypes of fileTypeList" [value]="fileTypes.value">{{fileTypes.fileType}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <div *ngIf="this.instructionForm.get('fileType').value  == 'json'">
+                    <mat-label>Indentation</mat-label>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <mat-form-field appearance="outline" *ngIf="this.instructionForm.get('fileType').value  == 'json'">
+                        <mat-label>Indentation</mat-label>
+                        <input matInput #indent placeholder="indent" formControlName="indent">
+                    </mat-form-field>
+                </div>
+                <div *ngIf="this.instructionForm.get('fileType').value  == 'csv'">
+                    <mat-label>File Header</mat-label>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <mat-slide-toggle formControlName="sampleFileHeader"
+                        *ngIf="this.instructionForm.get('fileType').value  == 'csv'">
+                        File Header
+                    </mat-slide-toggle>
+                </div>
+                <div *ngIf="this.instructionForm.get('fileType').value  == 'csv'">
+                    <mat-label>File Delimiter</mat-label>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <mat-form-field appearance="outline" *ngIf="this.instructionForm.get('fileType').value  == 'csv'">
+                        <mat-label>File Delimiter</mat-label>
+                        <input matInput #Delimiter placeholder="Delimiter" formControlName="delimiter">
+                    </mat-form-field>
+                </div>
+                <div
+                    *ngIf="this.instructionForm.get('fileType').value  == 'orc' || this.instructionForm.get('fileType').value  == 'parquet'">
+                    <mat-label>Spark Config File</mat-label>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <mat-form-field appearance="outline"
+                        *ngIf="this.instructionForm.get('fileType').value  == 'orc' || this.instructionForm.get('fileType').value  == 'parquet'">
+                        <mat-label>Spark Config File</mat-label>
+                        <input matInput #sparkConfFile placeholder="sparkConfFile" formControlName="sparkConfFile">
+                    </mat-form-field>
+                </div>
+                <br>
+                <mat-label>Variables</mat-label>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <button type="button" mat-button color="primary" (click)="addVariableFields()">{{variableFieldButton}}</button>
+                <mat-divider></mat-divider>
+                <mat-divider></mat-divider>
+                <br>
+                <br>
+                <mat-dialog-actions align="end">
+                    <button mat-stroked-button color="primary" (click)="createInstrcutionRequest()">Submit</button>
+                    &nbsp;&nbsp;&nbsp;
+                    <button mat-stroked-button color="danger" (click)="nextStep()">Cancel</button>
+                </mat-dialog-actions>
+            </div>
+        </form>
+    </mat-card-content>
+</mat-card>
+
+
+<!-- <ng-container *ngIf="variableRecord.length > 0">
+    <table mat-table [dataSource]="variableRecordDataSource" multiTemplateDataRows matSort class="table table-striped">
+        <ng-container matColumnDef="Column Name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Column Name
+            </th>
+            <td mat-cell *matCellDef="let variableField">{{variableField.columnName}}</td>
+        </ng-container>
+        <ng-container matColumnDef="Column Type">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Column Type
+            </th>
+            <td mat-cell *matCellDef="let variableField">{{variableField.columnType}}</td>
+        </ng-container>
+        <ng-container matColumnDef="Column Index">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Column Index
+            </th>
+            <td mat-cell *matCellDef="let variableField">{{variableField.columnIndex}}</td>
+        </ng-container>
+        <ng-container matColumnDef="Column Length">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Column Length
+            </th>
+            <td mat-cell *matCellDef="let variableField">{{variableField.columnLength}}</td>
+        </ng-container>
+        <ng-container matColumnDef="Mapped Flag">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Mapped Flag
+            </th>
+            <td mat-cell *matCellDef="let variableField">{{variableField.isMapped}}
+                <ng-container *ngIf="variableField.isMapped == 'True'">
+                    <button mat-button [matMenuTriggerFor]="belowMenu"><i
+                            class="material-icons">keyboard_arrow_down</i></button>
+                    <mat-menu #belowMenu="matMenu" yPosition="below">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Sl No.</th>
+                                    <th>Mapped FileName</th>
+                                    <th>Mapped FileType</th>
+                                    <th>Mapped ColumnName</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1.</td>
+                                    <td>{{variableField.mappedDetails.mappedFilename}}</td>
+                                    <td>{{variableField.mappedDetails.mappedFileType}}</td>
+                                    <td>{{variableField.mappedDetails.mappedFileColumn}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </mat-menu>
+                </ng-container>
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="Actions">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Actions
+            </th>
+            <td mat-cell *matCellDef="let variableField">
+                <i class="material-icons" style="cursor: pointer; color:green;" (click)="saveVariableDetails()"
+                    *ngIf="editFlag && variableField.columnName == editColumnName">check</i>
+                <i class="material-icons" style="cursor: pointer; color:blue;"
+                    (click)="editVariableDetails(variableField)" *ngIf="!editFlag">edit</i>
+                <span class="material-icons" style="cursor: pointer; color: red;" mat-tooltip="Delete Item"
+                    (click)="deleteVariableDetails(variableField.columnName)">cancel</span>
+            </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+</ng-container> -->

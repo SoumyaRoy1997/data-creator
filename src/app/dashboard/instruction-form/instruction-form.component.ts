@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, ElementRef, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -15,6 +15,7 @@ import { LoginService } from 'src/app/service/login.service';
 import { InstructionService } from '../../service/instruction.service';
 import Swal from 'sweetalert2';
 import { VariableFieldsComponent } from '../variable-fields/variable-fields.component';
+import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
   selector: 'app-instruction-form',
@@ -41,6 +42,20 @@ export class InstructionFormComponent implements OnInit {
   @ViewChild('sampleFileInput') sampleInputVariable: ElementRef<HTMLInputElement>;
   @Input() fileLocationFlag: boolean = false;
   subscription: Subscription;
+  @Output() showFormEvent = new EventEmitter<boolean>();
+  @Input() formHeading:string;
+  @Input() currentTestTime:Date;
+  @Input() currentTestName:string;
+  variableRecordDataSource:any;
+
+  fileTypeList = [{ 'fileType': "CSV", "value": "csv" },
+  { 'fileType': "JSON", "value": "json" },
+  { 'fileType': "PNR", "value": "pnr" },
+  { 'fileType': "XLSX", "value": "xlsx" },
+  { 'fileType': "XML", "value": "xml" },
+  { 'fileType': "ORC", "value": "orc" },
+  { 'fileType': "PARQUET", "value": "parquet" }
+  ]
 
   constructor(private dashboardService: DashboardService,
     private loginService: LoginService,
@@ -53,6 +68,9 @@ export class InstructionFormComponent implements OnInit {
   ngOnInit(): void {
     this.username = JSON.parse(localStorage.getItem('currentUser'))['username']
     console.log(this.instructionForm)
+    this.instructionForm.patchValue({
+      outputFilename: this.instanceName || this.instructionForm.get('outputFilename').value
+    })
     this.subscription = this.instructionService.getInstruction().subscribe(data => {
       if (data) {
         this.instruction = data;
@@ -66,61 +84,39 @@ export class InstructionFormComponent implements OnInit {
     });
   }
 
-  setStep(index: number) {
-    this.step = index;
-  }
   fileUpload(event) {
-    this.fileUploaded = true;
+    //this.fileUploaded = true;
     this.instruction = event;
-    this.fileLocationFlag = true;
+    //this.fileLocationFlag = true;
     this.nextStep();
   }
   nextStep() {
-    console.log("Hi - line 65")
-    if (this.step >= 1) {
-      if ((this.inputType !== "Form Input" || this.actualInputType == 'Upload File') && this.fileUploaded) {
-        const dialogRef = this.dialog.open(ConfirmationWindowComponent, {
-          width: 'auto',
-          data: {}
-        });
-        dialogRef.afterClosed().subscribe(result => {
-          if (result == 'No') {
-            this.postInstructionFile(this.instruction);
-          }
-          else {
-            this.actualInputType = 'Form Input'
-            this.step = 2;
-            var sampleFileHeader = false
-            var isFileLocal = true
-            if (this.instruction.sampleFileHeader == 'True')
-              sampleFileHeader = true;
-            if (this.instruction.isFileLocal == 'False')
-              isFileLocal = false;
-            this.instructionForm.patchValue({
-              sampleFilename: this.instruction.sampleFilename,
-              fileType: this.instruction.fileType,
-              fileLocation: this.instruction.fileLocation,
-              outputFolder: this.instruction.outputFolder,
-              outputFilename: this.instruction.outputFilename,
-              folders: this.instruction.folders,
-              files: this.instruction.files,
-              records: this.instruction.records,
-              indent: this.instruction.indent,
-              delimiter: this.instruction.delimiter,
-              isFileLocal: isFileLocal,
-              sampleFileHeader: sampleFileHeader
-            })
-            if (this.instruction['variableRecords'] != null || this.instruction['variableRecords'] != undefined) {
-              this.variableFieldButton = "Edit Variable Details";
-              this.addVariableFlag = true;
-              this.variableRecord = this.instruction['variableRecords'];
-            }
-            this.inputType = "Form Input";
-          }
-        });
+      this.instructionForm.get('inputType').setValue('Form Input')
+      var sampleFileHeader = false
+      if (this.instruction.sampleFileHeader == 'True')
+        sampleFileHeader = true;
+      this.instructionForm.patchValue({
+        sampleFilename: this.instruction.sampleFilename,
+        fileType: this.instruction.fileType,
+        fileLocation: this.instruction.fileLocation,
+        outputFolder: this.instruction.outputFolder,
+        //outputFilename: this.instruction.outputFilename,
+        folders: this.instruction.folders,
+        files: this.instruction.files,
+        records: this.instruction.records,
+        indent: this.instruction.indent,
+        delimiter: this.instruction.delimiter,
+        isFileLocal: this.instruction.isFileLocal,
+        sampleFileHeader: sampleFileHeader,
+        downloadFile: this.instruction.downloadFile
+      })
+      if (this.instruction['variableRecords'] != null || this.instruction['variableRecords'] != undefined) {
+        this.variableFieldButton = "Edit Variable Details";
+        this.addVariableFlag = true;
+        this.variableRecord = this.instruction['variableRecords'];
+        console.log(this.variableRecord)
+        this.variableRecordDataSource = new MatTableDataSource<variableFields>(this.variableRecord);
       }
-      this.createInstrcutionRequest();
-    }
   }
 
   postInstructionFile(instructionRequest: instructionJson) {
@@ -139,10 +135,9 @@ export class InstructionFormComponent implements OnInit {
       this.addVariableFlag = false;
       this.fileUploaded = false;
       this.variableFieldButton = "Add Variable Fields";
-      this.setStep(2);
       this.file = null;
       this.sampleFile = null;
-      console.log(userDetails)
+      console.log(data)
       this.loginService.editProfile(userDetails).subscribe(data => {
         var dashboardDetails: dashboard[] = JSON.parse(localStorage.getItem('dashboard'))
         dashboardDetails.push(dashboardRequest)
@@ -176,19 +171,15 @@ export class InstructionFormComponent implements OnInit {
         });
       }
       else {
-        Swal.fire("User", 'Your data generation was completed Successfully! ', 'success');
+        Swal.fire('Your data generation was completed Successfully! ', 'File Location: ' + data['fileLocation'], 'success');
       }
-
+      this.showFormEvent.emit(false)
     }, error => {
       Swal.fire("User", 'Your data generation was not completed ', 'error');
-      this.setStep(2);
       dialogRef.close();
     })
   }
 
-  prevStep() {
-    this.step--;
-  }
   onSampleFileChange(event) {
     this.sampleFile = event.target.files[0];
     this.sampleFileUploadFlag = true;
@@ -284,7 +275,8 @@ export class InstructionFormComponent implements OnInit {
           "isFileLocal": isFileLocal,
           "delimiter": this.instructionForm.get('delimiter').value,
           "sampleFileHeader": sampleFileHeader,
-          "variableRecords": this.variableRecord
+          "variableRecords": this.variableRecord,
+          "downloadFile":this.instructionForm.get('downloadFile').value
         }
       }
       else
