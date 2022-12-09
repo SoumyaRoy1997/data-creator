@@ -26,7 +26,8 @@ export class VariableFieldsComponent implements OnInit {
   editFlag: boolean = false;
   dataSource: any;
   editColumnName = "";
-  displayedColumns: string[] = ['Column Name', 'Column Type', 'Column Index', 'Column Length', 'Mapped Flag', 'Actions'];
+  //displayedColumns: string[] = ['checkFlag', 'Column Index','Column Name', 'Column Type', 'Column Length','domain','dateFormat','startDate','decrement','increment','sampleData', 'Mapped Flag', 'Actions'];
+  displayedColumns: string[] = ['checkFlag', 'Column Index','Column Name', 'Column Type', 'Column Length','domain','dateFormat','startDate','sampleData'];
   file: File = null;
   fileUploaded: boolean = false;
   mappedFileData = ''
@@ -77,8 +78,10 @@ export class VariableFieldsComponent implements OnInit {
       mappedFileHeader: [false],
     })
     // this.variableFieldArray[0].mappedDetails.
+    console.log(this.data)
     if (this.data.variableRecord.length > 0) {
       this.variableFieldArray = this.data.variableRecord;
+      console.log(this.variableFieldArray)
       this.dataSource = new MatTableDataSource<variableFields>(this.variableFieldArray);
     }
     if(this.data.isDisabled){

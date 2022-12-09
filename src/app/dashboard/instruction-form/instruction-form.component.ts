@@ -46,7 +46,10 @@ export class InstructionFormComponent implements OnInit {
   @Input() formHeading: string;
   @Input() currentTestTime: Date;
   @Input() currentTestName: string;
-  variableRecordDataSource: any;
+  sampleFileProcessed:boolean=false;
+  columnList = [];
+  valueList = [];
+  sampleFileColumnList: variableFields[] = [];
 
   fileTypeList = [{ 'fileType': "CSV", "value": "csv" },
   { 'fileType': "JSON", "value": "json" },
@@ -94,7 +97,7 @@ export class InstructionFormComponent implements OnInit {
     console.log(this.instruction)
     this.instructionForm.get('inputType').setValue('Form Input')
     var sampleFileHeader = false
-    if (this.instruction.sampleFileHeader == 'True')
+    if (this.instruction.sampleFileHeader)
       sampleFileHeader = true;
     if (this.instructionForm.get('downloadFile').value == 'True') {
       this.instruction.outputFolder = this.instruction.outputFilename || this.instanceName;
@@ -119,7 +122,6 @@ export class InstructionFormComponent implements OnInit {
       this.addVariableFlag = true;
       this.variableRecord = this.instruction['variableRecords'];
       console.log(this.variableRecord)
-      this.variableRecordDataSource = new MatTableDataSource<variableFields>(this.variableRecord);
     }
   }
 
@@ -186,47 +188,66 @@ export class InstructionFormComponent implements OnInit {
   onSampleFileChange(event) {
     this.sampleFile = event.target.files[0];
     this.sampleFileUploadFlag = true;
+    this.columnList = [];
+    this.valueList = [];
+    this.sampleFileColumnList= [];
     console.log(this.sampleFileUploadFlag);
   }
 
   onSampleFileUpload() {
-    var selectedFile = this.sampleFile;
-    const fileReader = new FileReader();
-    var fileSuffix = Date.now()
-    fileReader.readAsText(selectedFile, "UTF - 8");
-    fileReader.onload = () => {
-      this.sampleFileUploadFlag = !this.sampleFileUploadFlag
-      this.sampleInputVariable.nativeElement.value = null
-      if (this.instructionForm.get('fileType').value == 'json') {
-        this.sampleFileData = (JSON.parse(fileReader.result.toString()));
-        var request = { "type": "json", "usage": "sample", "data": this.sampleFileData, "filename": this.sampleFile.name.replace(".", "-" + fileSuffix + ".") };
-      }
-      else {
-        this.sampleFileData = fileReader.result.toString();
-        console.log(this.sampleFileData);
-        var request = { "type": "csv", "usage": "sample", "data": this.sampleFileData, "filename": this.sampleFile.name.replace(".", "-" + fileSuffix + ".") };
-      }
-      let dialogRef: MatDialogRef<ProgressSpinnerComponent> = this.dialog.open(ProgressSpinnerComponent, {
-        panelClass: 'transparent',
-        disableClose: true
+    if (this.instructionForm.get('fileType').value == '') {
+      this.snackBar.open("Select the file type first", "warn", {
+        duration: 2000,
       });
-      this.dashboardService.uploadSampleFile(request).subscribe(data => {
-        this.instructionForm.patchValue({
-          isFileLocal: 'False',
-          fileLocation: data['message']
-        })
-        this.instructionForm.get("isFileLocal").setValue('False');
-        this.instructionForm.get("fileLocation").setValue(data['message'])
-        dialogRef.close();
-        this.snackBar.open("Sample File Uploaded", "Success", {
-          duration: 2000,
-        });
-      }, error => {
-        dialogRef.close();
-      })
     }
-    fileReader.onerror = (error) => {
-      console.log(error);
+    else {
+      var selectedFile = this.sampleFile;
+      const fileReader = new FileReader();
+      var fileSuffix = Date.now()
+      fileReader.readAsText(selectedFile, "UTF - 8");
+      fileReader.onload = () => {
+        this.sampleFileUploadFlag = !this.sampleFileUploadFlag
+        this.sampleInputVariable.nativeElement.value = null
+        if (this.instructionForm.get('fileType').value == 'json') {
+          this.sampleFileData = (JSON.parse(fileReader.result.toString()));
+          var request = { "type": "json", "usage": "sample", "data": this.sampleFileData, "filename": this.sampleFile.name.replace(".", "-" + fileSuffix + ".") };
+          this.columnList = Object.keys(this.sampleFileData);
+          this.valueList = Object.values(this.sampleFileData)
+        }
+        else {
+          this.sampleFileData = fileReader.result.toString();
+          let lines = fileReader.result.toString().split(/\r|\n|\r/);
+          this.columnList = lines[0].split(',');
+          this.valueList = lines[2].split(',');
+          var request = { "type": "csv", "usage": "sample", "data": this.sampleFileData, "filename": this.sampleFile.name.replace(".", "-" + fileSuffix + ".") };
+        }
+        for (let index = 0; index < this.columnList.length; index++) {
+          let sampleRecord: variableFields = { "columnName": this.columnList[index], "sampleData": this.valueList[index], "columnIndex": index.toString(), "isMapped": "False" }
+          this.sampleFileColumnList.push(sampleRecord);
+        }
+        let dialogRef: MatDialogRef<ProgressSpinnerComponent> = this.dialog.open(ProgressSpinnerComponent, {
+          panelClass: 'transparent',
+          disableClose: true
+        });
+        this.dashboardService.uploadSampleFile(request).subscribe(data => {
+          this.instructionForm.patchValue({
+            isFileLocal: 'False',
+            fileLocation: data['message']
+          })
+          this.instructionForm.get("isFileLocal").setValue('False');
+          this.instructionForm.get("fileLocation").setValue(data['message'])
+          dialogRef.close();
+          this.sampleFileProcessed=true;
+          this.snackBar.open("Sample File Uploaded", "Success", {
+            duration: 2000,
+          });
+        }, error => {
+          dialogRef.close();
+        })
+      }
+      fileReader.onerror = (error) => {
+        console.log(error);
+      }
     }
   }
 
@@ -249,9 +270,13 @@ export class InstructionFormComponent implements OnInit {
   }
 
   addVariableFields() {
+    var data={ "variableRecord": this.variableRecord, "instanceName": this.instanceName, "isDisabled": this.isDisabled }
+    if(this.sampleFileProcessed){
+      var data={ "variableRecord": this.sampleFileColumnList, "instanceName": this.instanceName, "isDisabled": this.isDisabled }
+    }
     const dialogRef = this.dialog.open(VariableFieldsComponent, {
       width: 'auto',
-      data: { "variableRecord": this.variableRecord, "instanceName": this.instanceName, "isDisabled": this.isDisabled }
+      data: data
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -287,7 +312,38 @@ export class InstructionFormComponent implements OnInit {
     });
   }
 
+
+  // addVariableFields() {
+  //   if (this.sampleFileProcessed) {
+  //     this.variableRecord= this.sampleFileColumnList
+  //   }
+  //   this.variableFieldButton = "Edit Variable Details";
+  //   this.addVariableFlag = true;
+  //   // var isFileLocal = 'False';
+  //   // if (this.instructionForm.get('isFileLocal').value == 'True')
+  //   //   isFileLocal = 'True';
+  //   // var sampleFileHeader = 'False';
+  //   // if (this.instructionForm.get('sampleFileHeader').value)
+  //   //   sampleFileHeader = 'True';
+  //   // this.instruction = {
+  //   //   "sampleFilename": this.instructionForm.get("sampleFilename").value,
+  //   //   "fileType": this.instructionForm.get("fileType").value,
+  //   //   "fileLocation": this.instructionForm.get("fileLocation").value,
+  //   //   "outputFolder": this.instructionForm.get("outputFolder").value,
+  //   //   "outputFilename": this.instructionForm.get("outputFilename").value,
+  //   //   "folders": this.instructionForm.get("folders").value,
+  //   //   "files": this.instructionForm.get("files").value,
+  //   //   "records": this.instructionForm.get("records").value,
+  //   //   "indent": this.instructionForm.get("indent").value,
+  //   //   "isFileLocal": isFileLocal,
+  //   //   "delimiter": this.instructionForm.get('delimiter').value,
+  //   //   "sampleFileHeader": sampleFileHeader,
+  //   //   "variableRecords": this.variableRecord,
+  //   //   "downloadFile": this.instructionForm.get('downloadFile').value
+  //   // }
+  // }
   createInstrcutionRequest() {
+    console.log(this.instructionForm);
     if (this.instructionForm.valid) {
       console.log("Hi")
       console.log(this.instructionForm)

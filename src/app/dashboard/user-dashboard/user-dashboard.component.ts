@@ -89,11 +89,11 @@ export class UserDashboardComponent implements OnInit,AfterViewInit {
     this.showForm = true;
     this.instruction = JSON.parse(instruction);
     var sampleFileHeader = false
-    var isFileLocal = true
+    var isFileLocal = 'True'
     if (this.instruction.sampleFileHeader == 'True')
       sampleFileHeader = true;
-    if (this.instruction.isFileLocal == 'False')
-      isFileLocal = false;
+    if (!this.instruction.isFileLocal)
+      isFileLocal = 'False';
     this.instructionForm.patchValue({
       sampleFilename: this.instruction.sampleFilename,
       fileType: this.instruction.fileType,

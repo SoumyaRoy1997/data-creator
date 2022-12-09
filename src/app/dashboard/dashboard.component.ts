@@ -79,98 +79,30 @@ export class DashboardComponent implements OnInit {
       fileLocation: ['', Validators.required],
       outputFolder: [''],
       outputFilename: [''],
-      folders: ['', Validators.required],
+      folders: ['1'],
       files: ['', Validators.required],
       records: ['', Validators.required],
       sampleFileHeader: [''],
-      isFileLocal: [''],
+      isFileLocal: ['False'],
       indent: [''],
       delimiter: [''],
       sparkConfFile: [''],
       downloadFile: [''],
       inputType: ['']
     })
-    this.setStep(0);
   }
-  uploadFileSetStep(event) {
-    this.setStep(event)
-    this.inputType = 'Form Input'
-  }
-  setStep(index: number) {
-    this.step = index;
-  }
+
   setInstructionForm(event) {
     this.instructionForm = event;
   }
-  // nextStep() {
-  //   console.log(this.step)
-  //   if (this.step == 0) {
-  //     this.inputType = this.dashboardForm.get("instructionInput").value || 'Form Input'
-  //     this.instanceName = this.dashboardForm.get("instanceName").value || 'Sample'
-  //     if (this.inputType != 'Form Input')
-  //       this.step = 1;
-  //   }
-  //   if (this.step == 1 && this.inputType == 'Form Input') {
-  //     this.instructionPrimComp.nextStep();
-  //   }
-  //   else if (this.step == 1 && this.inputType == 'Upload File') {
-  //     this.inputType = 'Form Input'
-  //     this.actualInputType = 'Upload File'
-  //     this.step++;
-  //     return;
-  //   }
-  //   if (this.step == 2) {
-  //     this.childComponent.submitForm();
-  //     return;
-  //   }
-  //   this.step++;
-  // }
 
-  prevStep() {
-    this.step--;
-  }
-  onUpload(instruction) {
-    this.instruction = instruction;
-    this.fileUploaded = true;
-  }
-  onSampleFileChange(event) {
-    this.sampleFileUploadFlag = true;
-    this.childComponent.onSampleFileChange(event);
-    console.log(this.sampleFileUploadFlag);
-  }
-
-  onSampleFileUpload() {
-    this.childComponent.onSampleFileUpload();
-  }
-
-  addVariableFields() {
-    this.childComponent.addVariableFields();
-  }
-  onActivate(event) {
-    event.primaryInput.subscribe((data) => {
-      console.log(event)
-      console.log(data)
-      this.instructionForm = event;
-    })
-    event.customInput.subscribe((data) => {
-      console.log(event)
-      console.log(data)
-      this.instruction = event;
-    })
-    event.inputFlag.subscribe((data) => {
-      this.addVariableFlag = true;
-    })
-  }
   showInstruction(instruction,testName,testTime) {
     this.currentTestName = testName
     this.currentTestTime = testTime
     this.instruction = JSON.parse(instruction);
     var sampleFileHeader = false
-    var isFileLocal = true
     if (this.instruction.sampleFileHeader == 'True')
       sampleFileHeader = true;
-    if (this.instruction.isFileLocal == 'False')
-      isFileLocal = false;
     this.instructionForm.patchValue({
       sampleFilename: this.instruction.sampleFilename,
       fileType: this.instruction.fileType,
@@ -181,7 +113,7 @@ export class DashboardComponent implements OnInit {
       files: this.instruction.files,
       records: this.instruction.records,
       indent: this.instruction.indent,
-      isFileLocal: isFileLocal,
+      isFileLocal: this.instruction.isFileLocal,
       sampleFileHeader: sampleFileHeader,
       inputType:'Form Input'
     })
@@ -192,7 +124,6 @@ export class DashboardComponent implements OnInit {
     }
     this.formHeading='Edit Instruction for Data Generation Instance:'
     this.showForm = true;
-    //this.childComponent.nextStep();
   }
 
   createData() {
