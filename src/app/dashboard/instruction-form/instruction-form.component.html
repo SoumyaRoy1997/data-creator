@@ -90,18 +90,20 @@
                             <div class="col-md-3" style="padding: 0px;">
                                 <mat-label>Upload Sample File</mat-label>
                             </div>
-                            <div class="col-md-3" style="padding-left: 13px;">
+                            <div class="col-md-6" style="padding-left: 13px;">
                                 <input #sampleFileInput class="form-control form-control-sm" type="file"
                                     (change)="onSampleFileChange($event)" style="width: 250px;margin: 0;">
+                                    <ng-container *ngIf="sampleFileUploadFlag">
+                                        <i class="material-icons" style="cursor: pointer; color:green;" (click)="saveVariableDetails(index)">check</i> <h7 style="font-size: x-small;width: 450px;">{{this.instructionForm.get('fileLocation').value}}</h7>
+                                    </ng-container>
                             </div>
-                            <div class="col-md-3" style="padding: 0px;"></div>
+                            <!-- <div class="col-md-3" style="padding: 0px;"></div> -->
                             <div class="col-md-3">
                                 <ng-container *ngIf="sampleFileUploadFlag">
                                     <button type="button" mat-stroked-button color="success"
                                         (click)="onSampleFileUpload() && sampleFileUploadFlag=true"
                                         class="btn btn-success">Upload Sample
                                         File</button>
-                                    <!-- <button type="button" mat-stroked-button color="primary">Peek Sample Data</button> -->
                                 </ng-container>
                             </div>
                         </div>

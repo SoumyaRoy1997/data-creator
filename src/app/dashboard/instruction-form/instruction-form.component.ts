@@ -207,7 +207,7 @@ export class InstructionFormComponent implements OnInit {
       var fileSuffix = Date.now()
       fileReader.readAsText(selectedFile, "UTF - 8");
       fileReader.onload = () => {
-        this.sampleFileUploadFlag = !this.sampleFileUploadFlag
+        //this.sampleFileUploadFlag = !this.sampleFileUploadFlag
         this.sampleInputVariable.nativeElement.value = null
         if (this.instructionForm.get('fileType').value == 'json') {
           this.sampleFileData = (JSON.parse(fileReader.result.toString()));
@@ -232,17 +232,17 @@ export class InstructionFormComponent implements OnInit {
         });
         this.dashboardService.uploadSampleFile(request).subscribe(data => {
           this.instructionForm.patchValue({
-            isFileLocal: 'False',
+            //isFileLocal: 'False',
             fileLocation: data['message']
           })
-          this.instructionForm.get("isFileLocal").setValue('False');
+          //this.instructionForm.get("isFileLocal").setValue('False');
           this.instructionForm.get("fileLocation").setValue(data['message'])
           dialogRef.close();
           this.sampleFileProcessed = true;
           this.snackBar.open("Sample File Uploaded", "Success", {
             duration: 2000,
           });
-          if (this.instructionForm.get('isFileLocal').value == 'False') 
+          if (this.instructionForm.get('isFileLocal').value == 'True') 
           { this.variableFieldButton = "Configure Variables"; this.columnNumbers = this.sampleFileColumnList.length; }
         }, error => {
           dialogRef.close();
