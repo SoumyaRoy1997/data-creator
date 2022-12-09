@@ -114,15 +114,22 @@
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <mat-form-field appearance="outline">
                         <mat-label>File Location</mat-label>
-                        <input matInput #fileLocation placeholder="fileLocation" formControlName="fileLocation">
+                        <input matInput (change)="onEntering()" #fileLocation placeholder="fileLocation" formControlName="fileLocation">
                     </mat-form-field>
                 </div>
                 <div *ngIf="sampleFileProcessed">
                     <!-- <h4 style="font-style: italic;font-weight: bold;padding-top: 20px;">Variable Fields Rule Set Configuration</h4> -->
-                    <mat-label>Variables</mat-label>
+                    <!-- <mat-label>Variables</mat-label>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <button type="button" mat-button color="primary"
+                        (click)="addVariableFields()">{{variableFieldButton}}</button> -->
+                        <mat-label style="float:left">Variables</mat-label>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <mat-label>{{columnNumbers}} column variables added</mat-label>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <button type="button" mat-button color="primary"
                         (click)="addVariableFields()">{{variableFieldButton}}</button>
+
                     <!-- <app-variable-fields *ngIf="addVariableFlag" [variableFieldArray]="variableRecord" [isDisabled]="isDisabled"></app-variable-fields> -->
                 </div>
                 <mat-divider></mat-divider>
@@ -167,7 +174,8 @@
                 <mat-form-field appearance="outline">
                     <input matInput #records placeholder="Records" formControlName="records">
                 </mat-form-field>
-                <h6 style="font-style: italic;font-weight: bold;">Split the Records into *</h6>
+                <br>
+                <!-- <h6 style="font-style: italic;font-weight: bold;">Split the Records into *</h6> -->
                 <mat-label>How many Files do you need?</mat-label>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <mat-form-field appearance="outline">

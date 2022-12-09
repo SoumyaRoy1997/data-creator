@@ -46,7 +46,8 @@ export class InstructionFormComponent implements OnInit {
   @Input() formHeading: string;
   @Input() currentTestTime: Date;
   @Input() currentTestName: string;
-  sampleFileProcessed:boolean=false;
+  columnNumbers = 0;
+  sampleFileProcessed: boolean = false;
   columnList = [];
   valueList = [];
   sampleFileColumnList: variableFields[] = [];
@@ -79,7 +80,7 @@ export class InstructionFormComponent implements OnInit {
         this.instruction = data;
         console.log(this.instruction)
         if (this.instruction['variableRecords'] != null || this.instruction['variableRecords'] != undefined) {
-          this.variableFieldButton = "Edit Variable Details";
+          //this.variableFieldButton = "Edit Variable Details";
           this.addVariableFlag = true;
           this.variableRecord = this.instruction['variableRecords'];
         }
@@ -140,7 +141,7 @@ export class InstructionFormComponent implements OnInit {
       this.sampleFileUploadFlag = false;
       this.addVariableFlag = false;
       this.fileUploaded = false;
-      this.variableFieldButton = "Add Variable Fields";
+      //this.variableFieldButton = "Add Variable Fields";
       this.file = null;
       this.sampleFile = null;
       this.loginService.editProfile(userDetails).subscribe(data => {
@@ -190,7 +191,7 @@ export class InstructionFormComponent implements OnInit {
     this.sampleFileUploadFlag = true;
     this.columnList = [];
     this.valueList = [];
-    this.sampleFileColumnList= [];
+    this.sampleFileColumnList = [];
     console.log(this.sampleFileUploadFlag);
   }
 
@@ -222,7 +223,7 @@ export class InstructionFormComponent implements OnInit {
           var request = { "type": "csv", "usage": "sample", "data": this.sampleFileData, "filename": this.sampleFile.name.replace(".", "-" + fileSuffix + ".") };
         }
         for (let index = 0; index < this.columnList.length; index++) {
-          let sampleRecord: variableFields = { "columnName": this.columnList[index], "sampleData": this.valueList[index], "columnIndex": index.toString(), "isMapped": "False" }
+          let sampleRecord: variableFields = { "columnName": this.columnList[index], "sampleData": this.valueList[index], "columnIndex": index.toString(), "isMapped": "False", "checkFlag": false }
           this.sampleFileColumnList.push(sampleRecord);
         }
         let dialogRef: MatDialogRef<ProgressSpinnerComponent> = this.dialog.open(ProgressSpinnerComponent, {
@@ -237,10 +238,12 @@ export class InstructionFormComponent implements OnInit {
           this.instructionForm.get("isFileLocal").setValue('False');
           this.instructionForm.get("fileLocation").setValue(data['message'])
           dialogRef.close();
-          this.sampleFileProcessed=true;
+          this.sampleFileProcessed = true;
           this.snackBar.open("Sample File Uploaded", "Success", {
             duration: 2000,
           });
+          if (this.instructionForm.get('isFileLocal').value == 'False') 
+          { this.variableFieldButton = "Configure Variables"; this.columnNumbers = this.sampleFileColumnList.length; }
         }, error => {
           dialogRef.close();
         })
@@ -270,9 +273,9 @@ export class InstructionFormComponent implements OnInit {
   }
 
   addVariableFields() {
-    var data={ "variableRecord": this.variableRecord, "instanceName": this.instanceName, "isDisabled": this.isDisabled }
-    if(this.sampleFileProcessed){
-      var data={ "variableRecord": this.sampleFileColumnList, "instanceName": this.instanceName, "isDisabled": this.isDisabled }
+    var data = { "variableRecord": this.variableRecord, "instanceName": this.instanceName, "isDisabled": this.isDisabled }
+    if (this.sampleFileProcessed) {
+      var data = { "variableRecord": this.sampleFileColumnList, "instanceName": this.instanceName, "isDisabled": this.isDisabled }
     }
     const dialogRef = this.dialog.open(VariableFieldsComponent, {
       width: 'auto',
@@ -281,8 +284,9 @@ export class InstructionFormComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       this.variableRecord = result;
+      console.log(this.variableRecord)
       if (result !== undefined) {
-        this.variableFieldButton = "Edit Variable Details";
+        //this.variableFieldButton = "Edit Variable Details";
         this.addVariableFlag = true;
         var isFileLocal = 'False';
         if (this.instructionForm.get('isFileLocal').value == 'True')
@@ -294,8 +298,8 @@ export class InstructionFormComponent implements OnInit {
           "sampleFilename": this.instructionForm.get("sampleFilename").value,
           "fileType": this.instructionForm.get("fileType").value,
           "fileLocation": this.instructionForm.get("fileLocation").value,
-          "outputFolder": this.instructionForm.get("outputFolder").value,
-          "outputFilename": this.instructionForm.get("outputFilename").value,
+          "outputFolder": this.instructionForm.get("outputFolder").value || this.instanceName || 'Sample',
+          "outputFilename": this.instructionForm.get("outputFilename").value || this.instanceName || 'Sample',
           "folders": this.instructionForm.get("folders").value,
           "files": this.instructionForm.get("files").value,
           "records": this.instructionForm.get("records").value,
@@ -376,6 +380,11 @@ export class InstructionFormComponent implements OnInit {
       console.log(this.instruction)
       this.postInstructionFile(this.instruction);
     }
+  }
+
+  onEntering() {
+    console.log(this.instructionForm.get('isFileLocal').value)
+    this.sampleFileProcessed = true;
   }
 
 }

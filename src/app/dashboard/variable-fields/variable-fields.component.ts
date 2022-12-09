@@ -1,12 +1,14 @@
 import { Component, Inject, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
+import { Observable } from 'rxjs';
 import { ProgressSpinnerComponent } from 'src/app/common/progress-spinner/progress-spinner.component';
 import { mappedDetails } from 'src/app/models/mapped-details';
 import { variableFields } from 'src/app/models/variable-fields';
 import { DashboardService } from 'src/app/service/dashboard.service';
+import { dashboadFormModel } from '../../models/dashboard-form-model'
 
 @Component({
   selector: 'app-variable-fields',
@@ -17,7 +19,10 @@ export class VariableFieldsComponent implements OnInit {
 
   variableFieldForm: FormGroup;
   mappedDetailsForm: FormGroup;
+  variableFieldGroupForm: FormGroup;
+  variableFieldFormArray=this.fb.array([]);;
   variableFieldArray: variableFields[] = [];
+  editedVariableArray: variableFields[] = [];
   mappedRecord: mappedDetails;
   variableRecord: variableFields;
   mappedFlag: boolean = false;
@@ -41,13 +46,13 @@ export class VariableFieldsComponent implements OnInit {
                {'columnType':"DATE","value":"date"},
                {'columnType':"NUMERIC-TEXT","value":"numeric-text"},
                {'columnType':"EMAIL","value":"email"}]
-
   constructor(private fb: FormBuilder,
     public dialogRef: MatDialogRef<VariableFieldsComponent>,
     @Inject(MAT_DIALOG_DATA) public data,
     private dashboardService: DashboardService,
     private dialog: MatDialog,
-    public snackBar: MatSnackBar) { }
+    public snackBar: MatSnackBar,
+    public dashboadFormModel:dashboadFormModel) { }
 
   onNoClick(): void {
     this.dialogRef.close();
@@ -65,9 +70,10 @@ export class VariableFieldsComponent implements OnInit {
       decrement:[''],
       increment:[''],
       dateChange:[''],
+      checkFlag:[''],
       isMapped: [false, Validators.required]
     })
-
+    
     this.mappedDetailsForm = this.fb.group({
       fileLocalCheck: [false],
       mappedFilename: ['', Validators.required],
@@ -88,6 +94,29 @@ export class VariableFieldsComponent implements OnInit {
       this.variableFieldForm.disable();
       this.mappedDetailsForm.disable();
     }
+
+    this.data.variableRecord.forEach(element => {
+      this.editVariableDetails(element)
+      this.variableFieldFormArray.push(this.variableFieldForm)
+    });
+    console.log(this.variableFieldFormArray)
+    this.variableFieldGroupForm= this.fb.group({
+      variableFormRecords: this.variableFieldFormArray
+    })
+    console.log(this.variableFieldGroupForm)
+    
+    // this.data.variableRecord.forEach(element => {
+    //   // const fgs = element.map(dashboadFormModel.asFormGroup);
+    //   this.variableFieldFormArray= new FormArray(dashboadFormModel.asFormGroup);
+    //   this.variableFieldGroupForm.setControl('variableFields', this.variableFieldFormArray)
+    //  });
+    // console.log(this.variableFieldFormArray)
+    // this.variableFieldFormArray.forEach(variables => {
+    //   this.variableFieldGroupForm.setControl('variableFields', variables);
+    // });
+  }
+  get users() {
+    return this.variableFieldGroupForm.get('variableFields') as FormArray;
   }
 
   addMappedDetails(patchFlag: boolean) {
@@ -119,38 +148,48 @@ export class VariableFieldsComponent implements OnInit {
     console.log(this.mappedRecord);
   }
 
-  saveVariableDetails() {
+  saveVariableDetails(index) {
     if (this.editFlag){
       this.saveMappedDetails();
       this.editFlag = false;
     }
-    if (this.variableFieldForm.get("isMapped").value) {
+    console.log(this.variableFieldGroupForm.get('variableFormRecords').get(index.toString()))
+    if (this.variableFieldGroupForm.get('variableFormRecords').get(index.toString()).get("isMapped").value) {
       this.variableRecord = {
-        "columnType": this.variableFieldForm.get("columnType").value || "",
-        "columnName": this.variableFieldForm.get("columnName").value || "",
-        "columnIndex": this.variableFieldForm.get("columnIndex").value || "",
-        "columnLength": this.variableFieldForm.get("columnLength").value || "",
-        "domain": this.variableFieldForm.get("domain").value || "",
+        "columnType": this.variableFieldGroupForm.get('variableFormRecords').get(index.toString()).get("columnType").value || "",
+        "columnName": this.variableFieldArray[index].columnName,
+        "columnIndex": this.variableFieldArray[index].columnIndex,
+        "sampleData": this.variableFieldArray[index].sampleData,
+        "columnLength": this.variableFieldGroupForm.get('variableFormRecords').get(index.toString()).get("columnLength").value || "",
+        "domain": this.variableFieldGroupForm.get('variableFormRecords').get(index.toString()).get("domain").value || "",
+        "startDate": this.variableFieldGroupForm.get('variableFormRecords').get(index.toString()).get("startDate").value || "",
+        "dateFormat": this.variableFieldGroupForm.get('variableFormRecords').get(index.toString()).get("dateFormat").value || "",
         "isMapped": "True",
         "mappedDetails": this.mappedRecord
       }
     }
     else {
       this.variableRecord = {
-        "columnType": this.variableFieldForm.get("columnType").value || "",
-        "columnName": this.variableFieldForm.get("columnName").value || "",
-        "columnIndex": this.variableFieldForm.get("columnIndex").value || "",
-        "columnLength": this.variableFieldForm.get("columnLength").value || "",
-        "domain": this.variableFieldForm.get("domain").value || "",
+        "columnType": this.variableFieldGroupForm.get('variableFormRecords').get(index.toString()).get("columnType").value || "",
+        "columnName": this.variableFieldArray[index].columnName,
+        "columnIndex": this.variableFieldArray[index].columnIndex,
+        "sampleData": this.variableFieldArray[index].sampleData,
+        "columnLength": this.variableFieldGroupForm.get('variableFormRecords').get(index.toString()).get("columnLength").value || "",
+        "domain": this.variableFieldGroupForm.get('variableFormRecords').get(index.toString()).get("domain").value || "",
+        "startDate": this.variableFieldGroupForm.get('variableFormRecords').get(index.toString()).get("startDate").value || "",
+        "dateFormat": this.variableFieldGroupForm.get('variableFormRecords').get(index.toString()).get("dateFormat").value || "",
         "isMapped": "False",
       }
     }
     this.mappedValueFlag = false;
-    this.variableFieldArray = this.variableFieldArray.filter(value => this.variableRecord.columnName != value.columnName)
-    this.variableFieldArray.push(this.variableRecord);
-    this.dataSource = new MatTableDataSource<variableFields>(this.variableFieldArray);
-    this.variableFieldForm.reset();
-    this.mappedDetailsForm.reset();
+    this.editedVariableArray = this.editedVariableArray.filter(value => this.variableRecord.columnName != value.columnName)
+    this.editedVariableArray.push(this.variableRecord);
+    // this.variableFieldForm.reset();
+    // this.mappedDetailsForm.reset();
+    this.snackBar.open("Details for column: "+this.variableRecord.columnName+" was saved successfully", "Success", {
+      duration: 3000,
+    });
+    console.log(this.variableRecord)
   }
   editVariableDetails(variableRecord: variableFields) {
     this.editFlag = !this.editFlag;

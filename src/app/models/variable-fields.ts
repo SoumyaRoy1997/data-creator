@@ -11,5 +11,6 @@ export interface variableFields{
     dateFormat?:string,
 	startDate?:string,
 	decrement?:string,
-    increment?:string
+    increment?:string,
+    checkFlag?:boolean
 }

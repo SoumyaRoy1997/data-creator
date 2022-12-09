@@ -1,15 +1,20 @@
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { variableFields } from './variable-fields';
 
-export class Album {
-  userId: number;
-  id: number;
-  title: string;
+export class dashboadFormModel {
 
-  static asFormGroup(album: Album): FormGroup {
+  static asFormGroup(variableFieldForm: variableFields): FormGroup {
     const fg = new FormGroup({
-      userId: new FormControl(album.userId, Validators.required),
-      id: new FormControl(album.id, Validators.required),
-      title: new FormControl(album.title, Validators.required)
+        columnType: new FormControl(variableFieldForm.columnType, Validators.required),
+        columnName: new FormControl(variableFieldForm.columnName, Validators.required),
+        columnLength: new FormControl(variableFieldForm.columnLength, Validators.required),
+        columnIndex: new FormControl(variableFieldForm.columnIndex, Validators.required),
+        domain: new FormControl(variableFieldForm.domain, Validators.required),
+        sampleData: new FormControl(variableFieldForm.sampleData, Validators.required),
+        dateFormat: new FormControl(variableFieldForm.dateFormat, Validators.required),
+        startDate: new FormControl(variableFieldForm.startDate, Validators.required),
+        checkFlag: new FormControl(false, Validators.required),
+        // columnLength: new FormControl(variableFieldForm.columnLength, Validators.required),
     });
     return fg;
   }

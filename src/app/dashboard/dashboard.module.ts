@@ -11,6 +11,7 @@ import { UserDashboardComponent } from './user-dashboard/user-dashboard.componen
 import { InstructionFormComponent } from './instruction-form/instruction-form.component';
 import { InstructionPrimaryFormComponent } from './instruction-form/instruction-primary-form/instruction-primary-form.component';
 import { UploadInstructionFormComponent } from './instruction-form/upload-instruction-form/upload-instruction-form.component';
+import { dashboadFormModel } from '../models/dashboard-form-model';
 
 
 @NgModule({
@@ -34,7 +35,7 @@ import { UploadInstructionFormComponent } from './instruction-form/upload-instru
     VariableFieldsComponent,
     SharedModule
   ],
-  providers: [AuthenticationService],
+  providers: [AuthenticationService,dashboadFormModel],
   entryComponents: [ DashboardComponent]
   })
   export class DashboardModule {}
