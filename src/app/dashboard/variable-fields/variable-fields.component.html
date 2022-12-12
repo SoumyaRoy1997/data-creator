@@ -1,335 +1,125 @@
-<!-- <mat-dialog-content>
-    <div class="row">
-        <div class="col-md-2"></div>
-        <div class="col-md-9">
-            <mat-card-title>Variable Record Details</mat-card-title>
-        </div>
-        <div class="col-md-1">
-            <i class="material-icons" [mat-dialog-close]="variableFieldArray" color="warn" matTooltip="Close">close</i>
-        </div>
-    </div>
-    <form [formGroup]="variableFieldForm" class="example-headers-align">
-        <div class="float-left" style="justify-content: space-between;">
-            <mat-form-field appearance="outline">
-                <mat-label>Column Name</mat-label>
-                <input matInput #columnName placeholder="Column Name" formControlName="columnName">
-            </mat-form-field>
-            <mat-divider></mat-divider>
-            <mat-form-field appearance="outline">
-                <mat-label>Column Type</mat-label>
-                <mat-select formControlName="columnType">
-                    <mat-option *ngFor="let columnType of columnTypes" [value]="columnType.value">
-                        {{columnType.columnType}}</mat-option>
-                </mat-select>
-            </mat-form-field>
-            <mat-divider></mat-divider>
-            <mat-form-field appearance="outline" *ngIf="variableFieldForm.get('columnType').value == 'date'">
-                <mat-label>Date Format</mat-label>
-                <input matInput placeholder="Date Format" formControlName="dateFormat">
-            </mat-form-field>
-            <mat-divider></mat-divider>
-            <mat-form-field appearance="outline" *ngIf="variableFieldForm.get('columnType').value == 'date'">
-                <mat-label>Start Date</mat-label>
-                <input matInput placeholder="Start Date" formControlName="startDate">
-            </mat-form-field>
-            <mat-divider></mat-divider>
-        </div>
-        <div class="float-right">
-            <mat-form-field appearance="outline">
-                <mat-label>Column Index</mat-label>
-                <input matInput #columnIndex placeholder="Column Index" formControlName="columnIndex">
-            </mat-form-field>
-            <mat-divider></mat-divider>
-            <mat-form-field appearance="outline" *ngIf="variableFieldForm.get('columnType').value != 'date'">
-                <mat-label>Column Length</mat-label>
-                <input matInput #columnLength placeholder="Column Length" formControlName="columnLength">
-            </mat-form-field>
-            <mat-form-field appearance="outline" *ngIf="variableFieldForm.get('columnType').value == 'date'">
-                <mat-label>Date Change</mat-label>
-                <input matInput placeholder="Date Change" formControlName="dateChange">
-            </mat-form-field>
-            <mat-divider></mat-divider> -->
-<!-- <mat-form-field appearance="outline" *ngIf="variableFieldForm.get('columnType').value == 'date'"> -->
-<!-- <mat-label *ngIf="variableFieldForm.get('columnType').value == 'date'">Decrement</mat-label> -->
-<!-- <mat-checkbox formControlName="decrement" *ngIf="variableFieldForm.get('columnType').value == 'date'">Decrement</mat-checkbox> -->
-<!-- <input matInput #domain placeholder="Decrement" formControlName="decrement"> -->
-<!-- </mat-form-field> -->
-<!-- <mat-divider></mat-divider> -->
-<!-- <mat-form-field appearance="outline" *ngIf="variableFieldForm.get('columnType').value == 'date'">
-                <mat-label>Increment</mat-label>
-                <input matInput placeholder="Increment" formControlName="increment">
-            </mat-form-field> -->
-<!-- <mat-checkbox formControlName="increment" *ngIf="variableFieldForm.get('columnType').value == 'date'">Increment</mat-checkbox>
-            <mat-divider></mat-divider>
-        </div>
-        <div>
-            <mat-form-field appearance="outline" *ngIf="variableFieldForm.get('columnType').value == 'email'">
-                <mat-label>Domain</mat-label>
-                <input matInput #domain placeholder="Domain" formControlName="domain">
-            </mat-form-field>
-            <mat-slide-toggle formControlName="isMapped" style="padding-left: 40%;">
-                Mapped
-            </mat-slide-toggle>
-        </div>
-    </form>
-    <ng-container *ngIf="mappedFlag">
-        <form [formGroup]="mappedDetailsForm" class="example-headers-align">
-            <mat-slide-toggle formControlName="fileLocalCheck" style="padding-left: 40%;">
-                Is File Local?
-            </mat-slide-toggle>
-            <div class="float-left" style="justify-content: space-between;">
-                <mat-form-field appearance="outline" *ngIf="mappedDetailsForm.get('fileLocalCheck').value">
-                    <mat-label>Mapped Filename</mat-label>
-                    <input matInput #mappedFilename placeholder="Mapped Filename" formControlName="mappedFilename">
-                </mat-form-field>
-                <ng-container *ngIf="!mappedDetailsForm.get('fileLocalCheck').value">
-                    <mat-label>Mapped Filename</mat-label>
-                    <input class="form-control" type="file" (change)="onChange($event)" style="width: 250px;"> -->
-<!-- <button (click)="onUpload($event,'Mapping')" class="btn btn-success">
-                        Upload
-                    </button> -->
-<!-- </ng-container>
-                <mat-divider></mat-divider>
-                <mat-form-field appearance="outline">
-                    <mat-label>Mapped File Type</mat-label>
-                    <mat-select formControlName="mappedFileType">
-                        <mat-option *ngFor="let fileTypes of fileTypeList" [value]="fileTypes.value">
-                            {{fileTypes.fileType}}</mat-option>
+<ng-container>
+    <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort class="table table-striped"
+        [formGroup]="variableFieldGroupForm">
+        <ng-container matColumnDef="checkFlag">
+            <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="$event ? toggleAllRows() : null"
+                    [checked]="selection.hasValue() && isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()">
+                </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                    [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row)">
+                </mat-checkbox>
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="Column Index">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Column Index
+            </th>
+            <td mat-cell *matCellDef="let variableField" style="text-align: center !important;">
+                {{variableField.columnIndex}}
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="Column Name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Column Name
+            </th>
+            <td mat-cell *matCellDef="let variableField" style="text-align: left !important;">
+                {{variableField.columnName}}</td>
+        </ng-container>
+        <ng-container matColumnDef="Column Type" [formGroupName]="'variableFormRecords'">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Column Type
+            </th>
+            <td mat-cell *matCellDef="let variableField;" [trackBy]="trackByIndex"
+                [formGroupName]="variableField.formControlIndex">
+                <mat-form-field appearance="outline" style="width: 80%;margin-top:0 !important;" >
+                    <mat-label>Column Type</mat-label>
+                    <!-- (change)="(expandedElement = expandedElement === variableField ? null : variableField); $event.stopPropagation()" -->
+                    <mat-select [formControlName]="'columnType'" [disabled]="!selection.isSelected(variableField)">
+                        <mat-option *ngFor="let columnType of columnTypes" [value]="columnType.value" (click)="expandedElement = expandedElement === variableField ? null : variableField" [class.example-expanded-row]="expandedElement === variableField">
+                            {{columnType.columnType}}</mat-option>
                     </mat-select>
                 </mat-form-field>
-                <mat-divider></mat-divider>
-                <mat-form-field appearance="outline">
-                    <mat-label>Mapped Delimiter</mat-label>
-                    <input matInput #mappedFileDelim placeholder="Mapped Delimiter" formControlName="mappedFileDelim">
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="Column Length" [formGroupName]="'variableFormRecords'">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Column Length
+            </th>
+            <td mat-cell *matCellDef="let variableField" [formGroupName]="variableField.formControlIndex">
+                <mat-form-field appearance="outline" style="width: 80%;margin-top:0 !important;" [disabled]="!selection.isSelected(variableField)">
+                    <mat-label>Column Length</mat-label>
+                    <input matInput #columnLength [formControlName]="'columnLength'" placeholder="Column Length" [disabled]="!selection.isSelected(variableField)">
+                    <!-- formControlName="columnlength"> -->
                 </mat-form-field>
-            </div>
-            <div class="float-right">
-                <mat-form-field appearance="outline">
-                    <mat-label>Mapped Column</mat-label>
-                    <input matInput #mappedFileColumn placeholder="Mapped Column" formControlName="mappedFileColumn">
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="domain" [formGroupName]="'variableFormRecords'">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Email Domain
+            </th>
+            <td mat-cell *matCellDef="let variableField" [formGroupName]="variableField.formControlIndex">
+                <mat-form-field appearance="outline" style="width: 80%;margin-top:0 !important;">
+                    <mat-label>Email Domain</mat-label>
+                    <input matInput #domain placeholder="Email Domain" [formControlName]="'domain'" [disabled]="!selection.isSelected(variableField)">
+                    <!-- formControlName="domain"> -->
                 </mat-form-field>
-                <mat-divider></mat-divider>
-                <mat-form-field appearance="outline">
-                    <mat-label>Mapped Column Number</mat-label>
-                    <input matInput #mappedFileColumnNum placeholder="Mapped Column Number"
-                        formControlName="mappedFileColumnNum">
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="dateFormat" [formGroupName]="'variableFormRecords'">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Date Format
+            </th>
+            <td mat-cell *matCellDef="let variableField" [formGroupName]="variableField.formControlIndex">
+                <mat-form-field appearance="outline" style="width: 80%;margin-top:0 !important;">
+                    <mat-label>Date Format</mat-label>
+                    <input matInput placeholder="Date Format" [formControlName]="'dateFormat'" [disabled]="!selection.isSelected(variableField)">
+                    <!-- formControlName="dateFormat"> -->
                 </mat-form-field>
-                <mat-divider></mat-divider>
-                <mat-slide-toggle formControlName="mappedFileHeader" style="padding-left: 8%;padding-top: 10%;">
-                    Mapped File Header
-                </mat-slide-toggle>
-            </div>
-        </form>
-    </ng-container>
-    <ng-container *ngIf="variableFieldArray.length > 0">
-        <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort class="table table-striped"> -->
-<!-- <ng-container matColumnDef="Sl-No.">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Sl No.</th>
-                <td mat-cell *matCellDef="let variableField; index as i">{{row}}</td>
-            </ng-container> -->
-<!-- <ng-container matColumnDef="Column Name">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Column Name
-                </th>
-                <td mat-cell *matCellDef="let variableField">{{variableField.columnName}}</td>
-            </ng-container>
-            <ng-container matColumnDef="Column Type">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Column Type
-                </th>
-                <td mat-cell *matCellDef="let variableField">{{variableField.columnType}}</td>
-            </ng-container>
-            <ng-container matColumnDef="Column Index">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Column Index
-                </th>
-                <td mat-cell *matCellDef="let variableField">{{variableField.columnIndex}}</td>
-            </ng-container>
-            <ng-container matColumnDef="Column Length">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Column Length
-                </th>
-                <td mat-cell *matCellDef="let variableField">{{variableField.columnLength}}</td>
-            </ng-container>
-            <ng-container matColumnDef="Mapped Flag">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Mapped Flag
-                </th>
-                <td mat-cell *matCellDef="let variableField">{{variableField.isMapped}}
-                    <ng-container *ngIf="variableField.isMapped == 'True'">
-                        <button mat-button [matMenuTriggerFor]="belowMenu"><i
-                                class="material-icons">keyboard_arrow_down</i></button>
-                        <mat-menu #belowMenu="matMenu" yPosition="below">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Sl No.</th>
-                                        <th>Mapped FileName</th>
-                                        <th>Mapped FileType</th>
-                                        <th>Mapped ColumnName</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>1.</td>
-                                        <td>{{variableField.mappedDetails.mappedFilename}}</td>
-                                        <td>{{variableField.mappedDetails.mappedFileType}}</td>
-                                        <td>{{variableField.mappedDetails.mappedFileColumn}}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </mat-menu>
-                    </ng-container>
-                </td>
-            </ng-container>
-            <ng-container matColumnDef="Actions">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Actions
-                </th>
-                <td mat-cell *matCellDef="let variableField">
-                    <i class="material-icons" style="cursor: pointer; color:green;" (click)="saveVariableDetails()"
-                        *ngIf="editFlag && variableField.columnName == editColumnName">check</i>
-                    <i class="material-icons" style="cursor: pointer; color:blue;"
-                        (click)="editVariableDetails(variableField)" *ngIf="!editFlag">edit</i>
-                    <span class="material-icons" style="cursor: pointer; color: red;" mat-tooltip="Delete Item"
-                        (click)="deleteVariableDetails(variableField.columnName)">cancel</span>
-                </td>
-            </ng-container>
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
-    </ng-container>
-    <ng-container *ngIf="this.mappedValueFlag">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Sl No.</th>
-                    <th>Mapped FileName</th>
-                    <th>Mapped FileType</th>
-                    <th>Mapped ColumnName</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1.</td>
-                    <td>{{mappedRecord.mappedFilename}}</td>
-                    <td>{{mappedRecord.mappedFileType}}</td>
-                    <td>{{mappedRecord.mappedFileColumn}}</td>
-                </tr>
-            </tbody>
-        </table>
-    </ng-container>
-</mat-dialog-content>
-<mat-dialog-actions align="end">
-    <button mat-button color="success" (click)="onUpload()" class="btn btn-success"
-        *ngIf="!mappedDetailsForm.get('fileLocalCheck').value && fileUploaded">Upload Mapping File</button>
-    <button mat-button *ngIf="mappedFlag" class="btn btn-warning" color="warn" (click)="saveMappedDetails()">Save Mapped
-        Details</button>
-    <button mat-button class="btn btn-success" color="accent" (click)="addMappedDetails(true)"
-        [disabled]="!variableFieldForm.get('isMapped').value">{{mappedButton}}</button>
-    <button mat-button class="btn btn-warning" color="warn" (click)="saveVariableDetails()"
-        *ngIf="!mappedFlag && !editFlag">Save
-        Variable Details</button>
-</mat-dialog-actions> -->
-
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="startDate" [formGroupName]="'variableFormRecords'">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Start Date
+            </th>
+            <td mat-cell *matCellDef="let variableField" [formGroupName]="variableField.formControlIndex">
+                <mat-form-field appearance="outline" style="width: 80%;margin-top:0 !important;">
+                    <mat-label>Start Date</mat-label>
+                    <input matInput placeholder="Start Date" [formControlName]="'startDate'" [disabled]="!selection.isSelected(variableField)">
+                    <!-- formControlName="startDate"> -->
+                </mat-form-field>
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="sampleData">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Sample Data
+            </th>
+            <td mat-cell *matCellDef="let variableField" style="text-align: left !important;">
+                {{variableField.sampleData}}</td>
+        </ng-container>
+        <ng-container matColumnDef="Actions">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Actions
+            </th>
+            <td mat-cell *matCellDef="let variableField">
+                <button mat-raised-button><i class="material-icons" style="cursor: pointer; color:green;"
+                        (click)="saveVariableDetails(variableField.formControlIndex)">check</i></button>
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="expandedDetail">
+            <td mat-cell *matCellDef="let element" [attr.colspan]="columnsToDisplayWithExpand.length">
+                <div class="example-element-detail"
+                    [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+                    HI
+                </div>
+            </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;let index=index" class="example-element-row">
+        </tr>
+        <tr mat-row *matRowDef="let expandedrow; columns: ['expandedDetail']" class="example-detail-row"></tr>
+    </table>
+</ng-container>
+<!-- formArrayName="variableFormRecords" formGroupName="row" -->
 
 <!-- <ng-container [formGroup]="variableFieldGroupForm">
-<table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort class="table table-striped">
-    <ng-container matColumnDef="checkFlag">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Variable Field?</th>
-        <td mat-cell *matCellDef="let variableField; index as i" style="text-align: center !important;">
-            <mat-checkbox class="example-margin" value="variableField.checkFlag" formControlName="checkFlag"></mat-checkbox>
-        </td>
-    </ng-container>
-    <ng-container matColumnDef="Column Index">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Column Index
-        </th>
-        <td mat-cell *matCellDef="let variableField" style="text-align: center !important;" formControlName="columnIndex">{{variableField.columnIndex}}</td>
-    </ng-container>
-    <ng-container matColumnDef="Column Name">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Column Name
-        </th>
-        <td mat-cell *matCellDef="let variableField" style="text-align: left !important;" formControlName="columnName">{{variableField.columnName}}</td>
-    </ng-container>
-    <ng-container matColumnDef="Column Type">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Column Type
-        </th>
-        <td mat-cell *matCellDef="let variableField">
-            <mat-form-field appearance="outline" style="width: 80%;margin-top:0 !important;" [disabled]="!variableField.checkFlag">
-                <mat-label>Column Type</mat-label>
-                <mat-select >
-                    <mat-option *ngFor="let columnType of columnTypes" [value]="columnType.value">
-                        {{columnType.columnType}}</mat-option>
-                </mat-select>
-            </mat-form-field>
-        </td>
-    </ng-container>
-    <ng-container matColumnDef="Column Length">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Column Length
-        </th>
-        <td mat-cell *matCellDef="let variableField">
-            <mat-form-field appearance="outline" *ngIf="variableFieldForm.get('columnType').value != 'date'" style="width: 80%;margin-top:0 !important;" formControlName="columnlength">
-                <mat-label>Column Length</mat-label>
-                <input matInput #columnLength placeholder="Column Length" >
-            </mat-form-field>
-        </td>
-    </ng-container>
-    <ng-container matColumnDef="domain">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Email Domain
-        </th>
-        <td mat-cell *matCellDef="let variableField">
-            <mat-form-field appearance="outline" style="width: 80%;margin-top:0 !important;" formControlName="domain">
-                <mat-label>Email Domain</mat-label>
-                <input matInput #domain placeholder="Email Domain">
-            </mat-form-field>
-        </td>
-    </ng-container>
-    <ng-container matColumnDef="dateFormat">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Date Format
-        </th>
-        <td mat-cell *matCellDef="let variableField">
-            <mat-form-field appearance="outline"  style="width: 80%;margin-top:0 !important;" formControlName="dateFormat">
-                <mat-label>Date Format</mat-label>
-                <input matInput placeholder="Date Format" >
-            </mat-form-field>
-        </td>
-    </ng-container>
-    <ng-container matColumnDef="startDate">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Start Date
-        </th>
-        <td mat-cell *matCellDef="let variableField">
-            <mat-form-field appearance="outline" style="width: 80%;margin-top:0 !important;" formControlName="startDate">
-                <mat-label>Start Date</mat-label>
-                <input matInput placeholder="Start Date" >
-            </mat-form-field>
-        </td>
-    </ng-container>
-    <ng-container matColumnDef="sampleData">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Sample Data
-        </th>
-        <td mat-cell *matCellDef="let variableField" style="text-align: left !important;" formControlName="sampleData">{{variableField.sampleData}}</td>
-    </ng-container> -->
-
-<!-- <ng-container matColumnDef="Mapped Flag">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Mapped Flag
-        </th>
-        <td mat-cell *matCellDef="let variableField">{{variableField.isMapped}}</td>
-    </ng-container>
-    <ng-container matColumnDef="Actions">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Actions
-        </th>
-        <td mat-cell *matCellDef="let variableField">
-            <i class="material-icons" style="cursor: pointer; color:green;" (click)="saveVariableDetails()"
-                *ngIf="editFlag && variableField.columnName == editColumnName">check</i>
-            <i class="material-icons" style="cursor: pointer; color:blue;" (click)="editVariableDetails(variableField)"
-                *ngIf="!editFlag">edit</i>
-            <span class="material-icons" style="cursor: pointer; color: red;" mat-tooltip="Delete Item"
-                (click)="deleteVariableDetails(variableField.columnName)">cancel</span>
-        </td>
-    </ng-container> -->
-<!-- <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;" formGroupName="variableFormRecords"></tr>
-</table>
-</ng-container> -->
-<ng-container [formGroup]="variableFieldGroupForm">
     <table class="table table-striped">
         <thead>
             <tr>
-                <!-- <th>Variable Field</th> -->
                 <th>Column Index</th>
                 <th>Column Name</th>
                 <th>Column Type</th>
@@ -344,10 +134,6 @@
         <ng-container formArrayName="variableFormRecords">
             <tbody *ngFor="let i of variableFieldArray; let index=index" formGroupName="{{index}}">
                 <tr>
-                    <!-- <td>
-                        <mat-checkbox class="example-margin" formControlName="checkFlag">
-                        </mat-checkbox>
-                    </td> -->
                     <td>{{i.columnIndex}}</td>
                     <td>{{i.columnName}}</td>
                     <td>
@@ -373,14 +159,12 @@
                         </mat-form-field>
                     </td>
                     <td>
-                        <!-- {{i.dateFormat}} -->
                         <mat-form-field appearance="outline" style="width: 80%;margin-top:0 !important;">
                             <mat-label>Date Format</mat-label>
                             <input matInput placeholder="Date Format" formControlName="dateFormat">
                         </mat-form-field>
                     </td>
                     <td>
-                        <!-- {{i.startDate}} -->
                         <mat-form-field appearance="outline" style="width: 80%;margin-top:0 !important;">
                             <mat-label>Start Date</mat-label>
                             <input matInput placeholder="Start Date" formControlName="startDate">
@@ -390,16 +174,14 @@
                     <td>
                         <button mat-raised-button><i class="material-icons" style="cursor: pointer; color:green;" (click)="saveVariableDetails(index)">check</i>
                         </button>
-                        <!-- <button mat-raised-button><i class="material-icons" style="cursor: pointer; color:rgb(22, 24, 22);" matTooltip="This field has not been selected as a variable field" (click)="saveVariableDetails(index)" >block</i></button> -->
                     </td>
                 </tr>
             </tbody>
         </ng-container>
-        <!-- <tbody class="form-group"></tbody> -->
     </table>
-</ng-container>
+</ng-container> -->
 <mat-dialog-actions align="end">
-    <button mat-button class="btn btn-success" color="primary"  [mat-dialog-close]="editedVariableArray">Save
+    <button mat-button class="btn btn-success" color="primary" (click)="saveVariableRecords()">Save
         Variable Details</button>
-        <button mat-button mat-dialog-close class="btn btn-danger" color="primary" >Quit</button>
+    <button mat-button [mat-dialog-close]="editedVariableArray" class="btn btn-danger" color="primary">Quit</button>
 </mat-dialog-actions>

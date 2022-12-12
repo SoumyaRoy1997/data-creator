@@ -46,11 +46,15 @@ export class InstructionFormComponent implements OnInit {
   @Input() formHeading: string;
   @Input() currentTestTime: Date;
   @Input() currentTestName: string;
+  @Input() editFlag:boolean;
+  showForm: boolean = true;
   columnNumbers = 0;
   sampleFileProcessed: boolean = false;
   columnList = [];
   valueList = [];
   sampleFileColumnList: variableFields[] = [];
+
+  @Output() cancelEditForm = new EventEmitter<boolean>();
 
   fileTypeList = [{ 'fileType': "CSV", "value": "csv" },
   { 'fileType': "JSON", "value": "json" },
@@ -72,26 +76,21 @@ export class InstructionFormComponent implements OnInit {
   ngOnInit(): void {
     this.username = JSON.parse(localStorage.getItem('currentUser'))['username']
     console.log(this.instructionForm)
+    console.log(this.instruction)
     this.instructionForm.patchValue({
       outputFilename: this.instanceName || this.instructionForm.get('outputFilename').value
     })
-    this.subscription = this.instructionService.getInstruction().subscribe(data => {
-      if (data) {
-        this.instruction = data;
-        console.log(this.instruction)
-        if (this.instruction['variableRecords'] != null || this.instruction['variableRecords'] != undefined) {
-          //this.variableFieldButton = "Edit Variable Details";
-          this.addVariableFlag = true;
-          this.variableRecord = this.instruction['variableRecords'];
-        }
-      }
-    });
+    if (this.addVariableFlag) {
+      //this.variableFieldButton = "Edit Variable Details";
+      this.columnNumbers=this.variableRecord.length;
+      this.addVariableFlag = true;
+      this.variableRecord = this.instruction['variableRecords'];
+      this.onEntering();
+    }
   }
 
   fileUpload(event) {
-    //this.fileUploaded = true;
     this.instruction = event;
-    //this.fileLocationFlag = true;
     this.nextStep();
   }
   nextStep() {
@@ -207,7 +206,7 @@ export class InstructionFormComponent implements OnInit {
       var fileSuffix = Date.now()
       fileReader.readAsText(selectedFile, "UTF - 8");
       fileReader.onload = () => {
-        //this.sampleFileUploadFlag = !this.sampleFileUploadFlag
+        this.sampleFileUploadFlag = !this.sampleFileUploadFlag
         this.sampleInputVariable.nativeElement.value = null
         if (this.instructionForm.get('fileType').value == 'json') {
           this.sampleFileData = (JSON.parse(fileReader.result.toString()));
@@ -226,6 +225,8 @@ export class InstructionFormComponent implements OnInit {
           let sampleRecord: variableFields = { "columnName": this.columnList[index], "sampleData": this.valueList[index], "columnIndex": index.toString(), "isMapped": "False", "checkFlag": false }
           this.sampleFileColumnList.push(sampleRecord);
         }
+        this.variableRecord=[];
+        this.addVariableFlag=false;
         let dialogRef: MatDialogRef<ProgressSpinnerComponent> = this.dialog.open(ProgressSpinnerComponent, {
           panelClass: 'transparent',
           disableClose: true
@@ -242,8 +243,7 @@ export class InstructionFormComponent implements OnInit {
           this.snackBar.open("Sample File Uploaded", "Success", {
             duration: 2000,
           });
-          if (this.instructionForm.get('isFileLocal').value == 'True') 
-          { this.variableFieldButton = "Configure Variables"; this.columnNumbers = this.sampleFileColumnList.length; }
+          if (this.instructionForm.get('isFileLocal').value == 'True') { this.variableFieldButton = "Configure Variables"; this.columnNumbers = this.sampleFileColumnList.length; }
         }, error => {
           dialogRef.close();
         })
@@ -273,9 +273,15 @@ export class InstructionFormComponent implements OnInit {
   }
 
   addVariableFields() {
-    var data = { "variableRecord": this.variableRecord, "instanceName": this.instanceName, "isDisabled": this.isDisabled }
-    if (this.sampleFileProcessed) {
-      var data = { "variableRecord": this.sampleFileColumnList, "instanceName": this.instanceName, "isDisabled": this.isDisabled }
+    console.log(this.sampleFileColumnList)
+    if (this.addVariableFlag) {
+      var data = { "variableRecord": this.variableRecord, "instanceName": this.instanceName, "editFlag": this.editFlag,"newVariableRecords": false }
+    }
+    else if(this.sampleFileColumnList.length != 0){
+      var data = { "variableRecord": this.sampleFileColumnList, "instanceName": this.instanceName, "editFlag": this.editFlag,"newVariableRecords": false }
+    }
+    else{
+      var data = { "variableRecord": this.variableRecord, "instanceName": this.instanceName, "editFlag": this.editFlag,"newVariableRecords": true}
     }
     const dialogRef = this.dialog.open(VariableFieldsComponent, {
       width: 'auto',
@@ -283,9 +289,9 @@ export class InstructionFormComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      this.variableRecord = result;
-      console.log(this.variableRecord)
-      if (result !== undefined) {
+      console.log(result)
+      if (result !== undefined && result!= [] && result.length != 0) {
+        this.variableRecord = result;
         //this.variableFieldButton = "Edit Variable Details";
         this.addVariableFlag = true;
         var isFileLocal = 'False';
@@ -311,8 +317,10 @@ export class InstructionFormComponent implements OnInit {
           "downloadFile": this.instructionForm.get('downloadFile').value
         }
       }
-      else
+      else{
+        this.addVariableFlag=false;
         console.log("Null Value")
+      }
     });
   }
 
@@ -347,10 +355,7 @@ export class InstructionFormComponent implements OnInit {
   //   // }
   // }
   createInstrcutionRequest() {
-    console.log(this.instructionForm);
     if (this.instructionForm.valid) {
-      console.log("Hi")
-      console.log(this.instructionForm)
       var isFileLocal = 'False';
       if (this.instructionForm.get('isFileLocal').value) {
         isFileLocal = 'False';
@@ -358,14 +363,22 @@ export class InstructionFormComponent implements OnInit {
       var sampleFileHeader = 'False';
       if (this.instructionForm.get('sampleFileHeader').value)
         sampleFileHeader = 'True';
+      var outputFolder = this.instructionForm.get("outputFolder").value || this.instanceName
       if (this.instructionForm.get('downloadFile').value == 'True') {
-        this.instructionForm.get("outputFolder").setValue(this.instructionForm.get("outputFilename").value || this.instanceName);
+        if (this.instructionForm.get("outputFolder").value.includes("s3://")) {
+          if (this.instructionForm.get("outputFilename").value.includes("s3://" || '') ) {
+            outputFolder = this.instanceName
+          }
+          else{
+            outputFolder = this.instructionForm.get("outputFilename").value
+          }
+        }
       }
       this.instruction = {
         "sampleFilename": this.instructionForm.get("sampleFilename").value,
         "fileType": this.instructionForm.get("fileType").value,
         "fileLocation": this.instructionForm.get("fileLocation").value,
-        "outputFolder": this.instructionForm.get("outputFolder").value || this.instanceName,
+        "outputFolder": outputFolder,
         "outputFilename": this.instructionForm.get("outputFilename").value || this.instanceName,
         "folders": this.instructionForm.get("folders").value,
         "files": this.instructionForm.get("files").value,
@@ -383,8 +396,9 @@ export class InstructionFormComponent implements OnInit {
   }
 
   onEntering() {
-    console.log(this.instructionForm.get('isFileLocal').value)
     this.sampleFileProcessed = true;
   }
-
+  cancelEdit() {
+    this.cancelEditForm.emit(false)
+  }
 }

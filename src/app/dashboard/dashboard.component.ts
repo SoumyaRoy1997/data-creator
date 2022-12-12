@@ -15,6 +15,7 @@ import { registration } from '../models/registration-form';
 import { InstructionFormComponent } from './instruction-form/instruction-form.component';
 import { InstructionPrimaryFormComponent } from './instruction-form/instruction-primary-form/instruction-primary-form.component';
 import { dashboard } from '../models/dashboard-details';
+import { InstructionService } from '../service/instruction.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -43,17 +44,14 @@ export class DashboardComponent implements OnInit {
   currentTestTime: Date;
   showForm = false;
   formHeading='Create Data'
+  editFlag:boolean=false;
 
   @ViewChild('instructionInput') myInputVariable: ElementRef<HTMLInputElement>;
   @ViewChild('sampleFileInput') sampleInputVariable: ElementRef<HTMLInputElement>;
 
-  @ViewChild(InstructionFormComponent)
-  private childComponent: InstructionFormComponent;
-  @ViewChild(InstructionPrimaryFormComponent)
-  private instructionPrimComp: InstructionPrimaryFormComponent;
-
   constructor(private fb: FormBuilder,
-    public snackBar: MatSnackBar) { }
+    public snackBar: MatSnackBar,
+    private instructionService: InstructionService) { }
 
   ngOnInit(): void {
     this.username = JSON.parse(localStorage.getItem('currentUser'))['username']
@@ -68,6 +66,10 @@ export class DashboardComponent implements OnInit {
         counter++;
       }
     }
+    this.setForms();
+  }
+  
+  setForms(){
     this.dashboardForm = this.fb.group({
       instanceName: [''],
       generateloc: [''],
@@ -115,6 +117,7 @@ export class DashboardComponent implements OnInit {
       indent: this.instruction.indent,
       isFileLocal: this.instruction.isFileLocal,
       sampleFileHeader: sampleFileHeader,
+      delimiter: this.instruction.delimiter,
       inputType:'Form Input'
     })
     if (this.instruction['variableRecords'] != null || this.instruction['variableRecords'] != undefined) {
@@ -122,6 +125,8 @@ export class DashboardComponent implements OnInit {
       this.addVariableFlag = true;
       this.variableRecord = this.instruction['variableRecords'];
     }
+    this.instructionService.sendInstruction(instruction);
+    this.editFlag=true;
     this.formHeading='Edit Instruction for Data Generation Instance:'
     this.showForm = true;
   }
@@ -137,5 +142,15 @@ export class DashboardComponent implements OnInit {
       this.currentTestName=''
       this.currentTestTime=null
     }
+  }
+
+  cancelEditForm(){
+    this.formHeading='Create Data'
+    this.showForm = false;
+    this.dashboardForm.reset();
+    this.instructionForm.reset();
+    this.currentTestName=''
+    this.currentTestTime=null
+    this.editFlag=false;
   }
 }

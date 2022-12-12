@@ -33,7 +33,7 @@
                             [sampleFileUploadFlag]="sampleFileUploadFlag" [step]="step" [instruction]="instruction"
                             [variableRecord]="variableRecord" [variableFieldButton]="variableFieldButton"
                             [addVariableFlag]="addVariableFlag" [instanceName]="instanceName"
-                            [fileLocationFlag]="true" [formHeading]="formHeading" [currentTestName]="currentTestName" [currentTestTime]="currentTestTime" (showFormEvent)="createData()"></app-instruction-form>
+                            [fileLocationFlag]="true" [formHeading]="formHeading" [currentTestName]="currentTestName" [currentTestTime]="currentTestTime" (showFormEvent)="createData()" [editFlag]="editFlag" (cancelEditForm)="cancelEditForm()"></app-instruction-form>
             </ng-container>
         </div>
         <div class="col-md-2"></div>

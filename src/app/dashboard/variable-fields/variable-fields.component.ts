@@ -1,3 +1,5 @@
+import { animate, state, style, transition, trigger } from '@angular/animations';
+import { SelectionModel } from '@angular/cdk/collections';
 import { Component, Inject, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -13,14 +15,21 @@ import { dashboadFormModel } from '../../models/dashboard-form-model'
 @Component({
   selector: 'app-variable-fields',
   templateUrl: './variable-fields.component.html',
-  styleUrls: ['./variable-fields.component.scss']
+  styleUrls: ['./variable-fields.component.scss'],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed', style({height: '0px', minHeight: '0'})),
+      state('expanded', style({height: '*'})),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+  ]
 })
 export class VariableFieldsComponent implements OnInit {
 
   variableFieldForm: FormGroup;
   mappedDetailsForm: FormGroup;
   variableFieldGroupForm: FormGroup;
-  variableFieldFormArray=this.fb.array([]);;
+  variableFieldFormArray = this.fb.array([]);;
   variableFieldArray: variableFields[] = [];
   editedVariableArray: variableFields[] = [];
   mappedRecord: mappedDetails;
@@ -32,27 +41,30 @@ export class VariableFieldsComponent implements OnInit {
   dataSource: any;
   editColumnName = "";
   //displayedColumns: string[] = ['checkFlag', 'Column Index','Column Name', 'Column Type', 'Column Length','domain','dateFormat','startDate','decrement','increment','sampleData', 'Mapped Flag', 'Actions'];
-  displayedColumns: string[] = ['checkFlag', 'Column Index','Column Name', 'Column Type', 'Column Length','domain','dateFormat','startDate','sampleData'];
+  displayedColumns: string[] = ['checkFlag', 'Column Index', 'Column Name', 'Column Type', 'Column Length', 'domain', 'dateFormat', 'startDate', 'sampleData', 'Actions'];
   file: File = null;
   fileUploaded: boolean = false;
   mappedFileData = ''
-  mappedFilename:string="";
-  fileTypeList=[{'fileType':"CSV","value":"csv"},
-                {'fileType':"JSON","value":"json"}]
+  mappedFilename: string = "";
+  selection = new SelectionModel<variableFields>(true, []);
+  fileTypeList = [{ 'fileType': "CSV", "value": "csv" },
+  { 'fileType': "JSON", "value": "json" }]
+  columnsToDisplayWithExpand = [...this.displayedColumns, 'expand'];
+  expandedElement: variableFields | null;
 
-  columnTypes=[{'columnType':"ALPHANUMERIC","value":"alphanumeric"},
-               {'columnType':"TEXT","value":"text"},
-               {'columnType':"NUMBER","value":"number"},
-               {'columnType':"DATE","value":"date"},
-               {'columnType':"NUMERIC-TEXT","value":"numeric-text"},
-               {'columnType':"EMAIL","value":"email"}]
+  columnTypes = [{ 'columnType': "ALPHANUMERIC", "value": "alphanumeric" },
+  { 'columnType': "TEXT", "value": "text" },
+  { 'columnType': "NUMBER", "value": "number" },
+  { 'columnType': "DATE", "value": "date" },
+  { 'columnType': "NUMERIC-TEXT", "value": "numeric-text" },
+  { 'columnType': "EMAIL", "value": "email" }]
   constructor(private fb: FormBuilder,
     public dialogRef: MatDialogRef<VariableFieldsComponent>,
     @Inject(MAT_DIALOG_DATA) public data,
     private dashboardService: DashboardService,
     private dialog: MatDialog,
     public snackBar: MatSnackBar,
-    public dashboadFormModel:dashboadFormModel) { }
+    public dashboadFormModel: dashboadFormModel) { }
 
   onNoClick(): void {
     this.dialogRef.close();
@@ -65,15 +77,15 @@ export class VariableFieldsComponent implements OnInit {
       columnIndex: [''],
       columnLength: [''],
       domain: [''],
-      dateFormat:[''],
-      startDate:[''],
-      decrement:[''],
-      increment:[''],
-      dateChange:[''],
-      checkFlag:[''],
+      dateFormat: [''],
+      startDate: [''],
+      decrement: [''],
+      increment: [''],
+      dateChange: [''],
+      checkFlag: [''],
       isMapped: [false, Validators.required]
     })
-    
+
     this.mappedDetailsForm = this.fb.group({
       fileLocalCheck: [false],
       mappedFilename: ['', Validators.required],
@@ -83,37 +95,42 @@ export class VariableFieldsComponent implements OnInit {
       mappedFileDelim: [''],
       mappedFileHeader: [false],
     })
-    // this.variableFieldArray[0].mappedDetails.
-    console.log(this.data)
+    if(this.data.newVariableRecords){
     if (this.data.variableRecord.length > 0) {
       this.variableFieldArray = this.data.variableRecord;
-      console.log(this.variableFieldArray)
       this.dataSource = new MatTableDataSource<variableFields>(this.variableFieldArray);
     }
-    if(this.data.isDisabled){
+    if (this.data.isDisabled) {
       this.variableFieldForm.disable();
       this.mappedDetailsForm.disable();
     }
-
-    this.data.variableRecord.forEach(element => {
-      this.editVariableDetails(element)
-      this.variableFieldFormArray.push(this.variableFieldForm)
-    });
-    console.log(this.variableFieldFormArray)
-    this.variableFieldGroupForm= this.fb.group({
+    for (let index = 0; index < this.variableFieldArray.length; index++) {
+      const element = this.variableFieldArray[index];
+      element['formControlIndex'] = index;
+      this.variableFieldFormArray.insert(index,this.fb.group({
+        columnName: [element.columnName, Validators.required],
+        columnType: [element.columnType, Validators.required],
+        columnIndex: [element.columnIndex],
+        columnLength: [element.columnLength],
+        domain: [element.domain],
+        dateFormat: [''],
+        startDate: [''],
+        decrement: [''],
+        increment: [''],
+        dateChange: [''],
+        checkFlag: [''],
+        isMapped: [false, Validators.required]
+      }))
+    }
+    this.variableFieldGroupForm = this.fb.group({
       variableFormRecords: this.variableFieldFormArray
     })
-    console.log(this.variableFieldGroupForm)
+    if(this.data.editFlag)
+    this.toggleAllRows();
+  }
+  else{
     
-    // this.data.variableRecord.forEach(element => {
-    //   // const fgs = element.map(dashboadFormModel.asFormGroup);
-    //   this.variableFieldFormArray= new FormArray(dashboadFormModel.asFormGroup);
-    //   this.variableFieldGroupForm.setControl('variableFields', this.variableFieldFormArray)
-    //  });
-    // console.log(this.variableFieldFormArray)
-    // this.variableFieldFormArray.forEach(variables => {
-    //   this.variableFieldGroupForm.setControl('variableFields', variables);
-    // });
+  }
   }
   get users() {
     return this.variableFieldGroupForm.get('variableFields') as FormArray;
@@ -147,9 +164,16 @@ export class VariableFieldsComponent implements OnInit {
     this.addMappedDetails(false);
     console.log(this.mappedRecord);
   }
-
+  saveVariableRecords(){
+    var tempSelection=this.selection
+    this.variableFieldArray.forEach(data=>{
+      if(tempSelection.isSelected(data))
+      this.saveVariableDetails(data.formControlIndex)
+    })
+    console.log(this.editedVariableArray)
+  }
   saveVariableDetails(index) {
-    if (this.editFlag){
+    if (this.editFlag) {
       this.saveMappedDetails();
       this.editFlag = false;
     }
@@ -184,12 +208,12 @@ export class VariableFieldsComponent implements OnInit {
     this.mappedValueFlag = false;
     this.editedVariableArray = this.editedVariableArray.filter(value => this.variableRecord.columnName != value.columnName)
     this.editedVariableArray.push(this.variableRecord);
-    // this.variableFieldForm.reset();
-    // this.mappedDetailsForm.reset();
-    this.snackBar.open("Details for column: "+this.variableRecord.columnName+" was saved successfully", "Success", {
-      duration: 3000,
-    });
-    console.log(this.variableRecord)
+    // // this.variableFieldForm.reset();
+    // // this.mappedDetailsForm.reset();
+    // this.snackBar.open("Details for column: " + this.variableRecord.columnName + " was saved successfully", "Success", {
+    //   duration: 3000,
+    // });
+    // console.log(this.variableRecord)
   }
   editVariableDetails(variableRecord: variableFields) {
     this.editFlag = !this.editFlag;
@@ -201,8 +225,8 @@ export class VariableFieldsComponent implements OnInit {
       var mappedFileHeader = false
       if (variableRecord.mappedDetails.mappedFileHeader == "True")
         mappedFileHeader = true
-      if(variableRecord.mappedDetails.mappedFilename.includes('s3://'))
-        this.mappedDetailsForm.patchValue({fileLocalCheck:false})
+      if (variableRecord.mappedDetails.mappedFilename.includes('s3://'))
+        this.mappedDetailsForm.patchValue({ fileLocalCheck: false })
       this.mappedDetailsForm.patchValue({
         mappedFileColumn: variableRecord.mappedDetails.mappedFileColumn,
         mappedFileColumnNum: variableRecord.mappedDetails.mappedFileColumnNum,
@@ -223,7 +247,7 @@ export class VariableFieldsComponent implements OnInit {
       domain: variableRecord.domain,
       isMapped: this.mappedValueFlag,
     });
-    if(this.data.isDisabled){
+    if (this.data.isDisabled) {
       this.variableFieldForm.disable();
       this.mappedDetailsForm.disable();
     }
@@ -236,23 +260,23 @@ export class VariableFieldsComponent implements OnInit {
 
   onChange(event) {
     this.file = event.target.files[0];
-    this.mappedFilename=this.file.name;
-    this.fileUploaded=true;
+    this.mappedFilename = this.file.name;
+    this.fileUploaded = true;
   }
   onUpload(event, type: string) {
     var selectedFile = this.file;
     const fileReader = new FileReader();
     fileReader.readAsText(selectedFile, "UTF - 8");
-    var fileSuffix=this.variableFieldForm.get('columnName').value || this.mappedDetailsForm.get('mappedFileColumn').value
+    var fileSuffix = this.variableFieldForm.get('columnName').value || this.mappedDetailsForm.get('mappedFileColumn').value
     fileReader.onload = () => {
-      this.fileUploaded=false;
+      this.fileUploaded = false;
       if (this.mappedDetailsForm.get('mappedFileType').value == 'json') {
         this.mappedFileData = (JSON.parse(fileReader.result.toString()));
-        var request = { "type": "json", "usage":"mapping","data": this.mappedFileData ,"filename":this.mappedFilename.replace(".","-"+fileSuffix+".")};
+        var request = { "type": "json", "usage": "mapping", "data": this.mappedFileData, "filename": this.mappedFilename.replace(".", "-" + fileSuffix + ".") };
       }
       else {
         this.mappedFileData = fileReader.result.toString();
-        var request = { "type": "csv", "usage":"mapping","data": this.mappedFileData ,"filename":this.mappedFilename.replace(".","-"+fileSuffix+".")};
+        var request = { "type": "csv", "usage": "mapping", "data": this.mappedFileData, "filename": this.mappedFilename.replace(".", "-" + fileSuffix + ".") };
       }
       let dialogRef: MatDialogRef<ProgressSpinnerComponent> = this.dialog.open(ProgressSpinnerComponent, {
         panelClass: 'transparent',
@@ -270,7 +294,7 @@ export class VariableFieldsComponent implements OnInit {
         this.snackBar.open("Sample File Uploaded", "Success", {
           duration: 2000,
         });
-      },error=>{
+      }, error => {
         dialogRef.close();
       })
     }
@@ -278,4 +302,30 @@ export class VariableFieldsComponent implements OnInit {
       console.log(error);
     }
   }
+
+  isAllSelected() {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.dataSource.data.length;
+    return numSelected === numRows;
+  }
+
+  /** Selects all rows if they are not all selected; otherwise clear selection. */
+  toggleAllRows() {
+    if (this.isAllSelected()) {
+      this.selection.clear();
+      return;
+    }
+
+    this.selection.select(...this.dataSource.data);
+  }
+
+  /** The label for the checkbox on the passed row */
+  checkboxLabel(row?: variableFields): string {
+    if (!row) {
+      return `${this.isAllSelected() ? 'deselect' : 'select'} all`;
+    }
+    return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row `;
+  }
+
+  trackByIndex(i) { return i; }
 }

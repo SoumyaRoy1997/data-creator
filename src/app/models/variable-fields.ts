@@ -12,5 +12,6 @@ export interface variableFields{
 	startDate?:string,
 	decrement?:string,
     increment?:string,
-    checkFlag?:boolean
+    checkFlag?:boolean,
+    formControlIndex?:number
 }

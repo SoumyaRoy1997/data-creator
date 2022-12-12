@@ -93,7 +93,7 @@
                             <div class="col-md-6" style="padding-left: 13px;">
                                 <input #sampleFileInput class="form-control form-control-sm" type="file"
                                     (change)="onSampleFileChange($event)" style="width: 250px;margin: 0;">
-                                    <ng-container *ngIf="sampleFileUploadFlag">
+                                    <ng-container *ngIf="sampleFileProcessed">
                                         <i class="material-icons" style="cursor: pointer; color:green;" (click)="saveVariableDetails(index)">check</i> <h7 style="font-size: x-small;width: 450px;">{{this.instructionForm.get('fileLocation').value}}</h7>
                                     </ng-container>
                             </div>
@@ -194,7 +194,7 @@
                 <mat-card-actions align="end">
                     <button mat-stroked-button color="primary" (click)="createInstrcutionRequest()">Submit</button>
                     &nbsp;&nbsp;&nbsp;
-                    <button mat-stroked-button color="danger" (click)="nextStep()">Cancel</button>
+                    <button mat-stroked-button color="danger" (click)="cancelEdit()">Cancel</button>
                 </mat-card-actions>
             </div>
         </form>
