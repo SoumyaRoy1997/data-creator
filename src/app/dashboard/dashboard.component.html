@@ -6,11 +6,10 @@
             <form [formGroup]="dashboardForm">
                 <mat-form-field class="example-full-width" appearance="outline" style="width: 80%;">
                     <mat-label>Enter the Data Generation Instance Name</mat-label>
-                    <input matInput placeholder="instanceName" formControlName="instanceName">
+                    <input matInput placeholder="Instance Name" formControlName="instanceName">
                 </mat-form-field>
-                &nbsp;&nbsp;
-                <button mat-raised-button color="primary" (click)="createData()"
-                    style="border-radius: 12px;height: 50px;">Create</button>
+                <!-- &nbsp;&nbsp; -->
+                <button class="btn btn-secondary createButton" color="primary" (click)="createData()">Create</button>
             </form>
         </ng-container>
             <ng-container *ngIf="datasourceLoaded">

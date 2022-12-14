@@ -40,8 +40,7 @@ export class VariableFieldsComponent implements OnInit {
   editFlag: boolean = false;
   dataSource: any;
   editColumnName = "";
-  //displayedColumns: string[] = ['checkFlag', 'Column Index','Column Name', 'Column Type', 'Column Length','domain','dateFormat','startDate','decrement','increment','sampleData', 'Mapped Flag', 'Actions'];
-  displayedColumns: string[] = ['checkFlag', 'Column Index', 'Column Name', 'Column Type', 'Column Length', 'domain', 'dateFormat', 'startDate', 'sampleData', 'Actions'];
+  displayedColumns: string[] = [ 'checkFlag','Column Index', 'Column Name', 'Column Type','sampleData','expand']
   file: File = null;
   fileUploaded: boolean = false;
   mappedFileData = ''
@@ -51,6 +50,9 @@ export class VariableFieldsComponent implements OnInit {
   { 'fileType': "JSON", "value": "json" }]
   columnsToDisplayWithExpand = [...this.displayedColumns, 'expand'];
   expandedElement: variableFields | null;
+  variableFieldsSaved:boolean=false;
+  currentColumnType='';
+  currentVariableField:variableFields;
 
   columnTypes = [{ 'columnType': "ALPHANUMERIC", "value": "alphanumeric" },
   { 'columnType': "TEXT", "value": "text" },
@@ -95,7 +97,7 @@ export class VariableFieldsComponent implements OnInit {
       mappedFileDelim: [''],
       mappedFileHeader: [false],
     })
-    if(this.data.newVariableRecords){
+    if(!this.data.newVariableRecords){
     if (this.data.variableRecord.length > 0) {
       this.variableFieldArray = this.data.variableRecord;
       this.dataSource = new MatTableDataSource<variableFields>(this.variableFieldArray);
@@ -129,7 +131,7 @@ export class VariableFieldsComponent implements OnInit {
     this.toggleAllRows();
   }
   else{
-    
+
   }
   }
   get users() {
@@ -171,6 +173,10 @@ export class VariableFieldsComponent implements OnInit {
       this.saveVariableDetails(data.formControlIndex)
     })
     console.log(this.editedVariableArray)
+    this.variableFieldsSaved=true;
+    this.snackBar.open("Your Details were saved successfully! ", "Success", {
+      duration: 3000,
+    });
   }
   saveVariableDetails(index) {
     if (this.editFlag) {
@@ -328,4 +334,14 @@ export class VariableFieldsComponent implements OnInit {
   }
 
   trackByIndex(i) { return i; }
+  setValue(value,variableField){
+    this.currentVariableField=variableField
+    this.currentColumnType=value;
+  }
+  checkExpand(index,variableField){
+    if(this.currentColumnType != this.variableFieldGroupForm.get('variableFormRecords').get(index.toString()).get('columnType').value && this.currentVariableField == variableField)
+     return 'expanded'
+    else
+     return 'collapsed'
+  }
 }

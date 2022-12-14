@@ -75,8 +75,6 @@ export class InstructionFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.username = JSON.parse(localStorage.getItem('currentUser'))['username']
-    console.log(this.instructionForm)
-    console.log(this.instruction)
     this.instructionForm.patchValue({
       outputFilename: this.instanceName || this.instructionForm.get('outputFilename').value
     })
@@ -95,7 +93,7 @@ export class InstructionFormComponent implements OnInit {
   }
   nextStep() {
     console.log(this.instruction)
-    this.instructionForm.get('inputType').setValue('Form Input')
+    // this.instructionForm.get('inputType').setValue('Form Input')
     var sampleFileHeader = false
     if (this.instruction.sampleFileHeader)
       sampleFileHeader = true;
@@ -103,6 +101,7 @@ export class InstructionFormComponent implements OnInit {
       this.instruction.outputFolder = this.instruction.outputFilename || this.instanceName;
     }
     this.instructionForm.patchValue({
+      inputType:'Form Input',
       sampleFilename: this.instruction.sampleFilename,
       fileType: this.instruction.fileType,
       fileLocation: this.instruction.fileLocation,
@@ -120,6 +119,7 @@ export class InstructionFormComponent implements OnInit {
     if (this.instruction['variableRecords'] != null || this.instruction['variableRecords'] != undefined) {
       this.variableFieldButton = "Edit Variable Details";
       this.addVariableFlag = true;
+      this.editFlag=true;
       this.variableRecord = this.instruction['variableRecords'];
       console.log(this.variableRecord)
     }
@@ -140,6 +140,7 @@ export class InstructionFormComponent implements OnInit {
       this.sampleFileUploadFlag = false;
       this.addVariableFlag = false;
       this.fileUploaded = false;
+      this.columnNumbers=0;
       //this.variableFieldButton = "Add Variable Fields";
       this.file = null;
       this.sampleFile = null;
@@ -273,7 +274,6 @@ export class InstructionFormComponent implements OnInit {
   }
 
   addVariableFields() {
-    console.log(this.sampleFileColumnList)
     if (this.addVariableFlag) {
       var data = { "variableRecord": this.variableRecord, "instanceName": this.instanceName, "editFlag": this.editFlag,"newVariableRecords": false }
     }
@@ -316,9 +316,13 @@ export class InstructionFormComponent implements OnInit {
           "variableRecords": this.variableRecord,
           "downloadFile": this.instructionForm.get('downloadFile').value
         }
+        this.columnNumbers=this.variableRecord.length
       }
-      else{
+      else if (result == []){
         this.addVariableFlag=false;
+        console.log("Null Value")
+      }
+      else if (result == undefined){
         console.log("Null Value")
       }
     });

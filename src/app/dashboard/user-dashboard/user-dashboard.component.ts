@@ -136,4 +136,22 @@ export class UserDashboardComponent implements OnInit,AfterViewInit {
   onSampleFileUpload() {
     this.childComponent.onSampleFileUpload();
   }
+  createData() {
+    this.showForm = !this.showForm;
+    if (this.showForm) {
+      this.formHeading='Create Data'
+    }
+    else{
+      this.currentTestName=''
+      this.currentTestTime=null
+    }
+  }
+
+  cancelEditForm(){
+    this.formHeading='Create Data'
+    this.showForm = false;
+    this.instructionForm.reset();
+    this.currentTestName=''
+    this.currentTestTime=null
+  }
 }

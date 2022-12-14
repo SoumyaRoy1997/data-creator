@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "dist/data-creator-ui",
+    "public": "dist\\data-creator-ui",
     "ignore": [
       "firebase.json",
       "**/.*",

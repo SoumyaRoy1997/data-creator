@@ -43,7 +43,7 @@ export class DashboardComponent implements OnInit {
   currentTestName = ''
   currentTestTime: Date;
   showForm = false;
-  formHeading='Create Data'
+  formHeading='Generate Data'
   editFlag:boolean=false;
 
   @ViewChild('instructionInput') myInputVariable: ElementRef<HTMLInputElement>;
@@ -84,7 +84,7 @@ export class DashboardComponent implements OnInit {
       folders: ['1'],
       files: ['', Validators.required],
       records: ['', Validators.required],
-      sampleFileHeader: [''],
+      sampleFileHeader: [false],
       isFileLocal: ['False'],
       indent: [''],
       delimiter: [''],
@@ -135,7 +135,7 @@ export class DashboardComponent implements OnInit {
     this.showForm = !this.showForm;
     if (this.showForm) {
       this.instanceName = this.dashboardForm.get('instanceName').value;
-      this.formHeading='Create Data'
+      this.formHeading='Generate Data'
     }
     else{
       this.dashboardForm.reset();
@@ -145,7 +145,7 @@ export class DashboardComponent implements OnInit {
   }
 
   cancelEditForm(){
-    this.formHeading='Create Data'
+    this.formHeading='Generate Data'
     this.showForm = false;
     this.dashboardForm.reset();
     this.instructionForm.reset();

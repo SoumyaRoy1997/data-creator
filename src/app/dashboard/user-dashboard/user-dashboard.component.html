@@ -19,7 +19,7 @@
                     [sampleFileUploadFlag]="sampleFileUploadFlag" [step]="step" [instruction]="instruction"
                     [variableRecord]="variableRecord" [variableFieldButton]="variableFieldButton"
                     [addVariableFlag]="addVariableFlag" [isDisabled]="isDisabled" [instanceName]="instanceName"
-                    [fileLocationFlag]="true" [formHeading]="formHeading" [currentTestName]="currentTestName" [currentTestTime]="currentTestTime"></app-instruction-form>
+                    [fileLocationFlag]="true" [formHeading]="formHeading" [currentTestName]="currentTestName" [currentTestTime]="currentTestTime" (showFormEvent)="createData()" [editFlag]="editFlag" (cancelEditForm)="cancelEditForm()"></app-instruction-form>
             </div>
             <div class="col-md-1"></div>
         </div>

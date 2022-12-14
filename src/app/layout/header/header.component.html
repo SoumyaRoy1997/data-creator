@@ -1,4 +1,4 @@
-<mat-toolbar style="background: #3f51b5;color: white;">
+<mat-toolbar style="background: #091426;color: white;">
     <ng-container *ngIf="authenticated">
         <button mat-icon-button (click)="clickMenu()">
             <mat-icon>menu</mat-icon>
@@ -7,19 +7,26 @@
     <img style="float: left;" class="siteLogo"
         src="//content.delta.com/content/www/apac/en.damAssetRender.20211110T1419424440500.html/content/dam/delta_homepage_redesign/Logo/Delta-Logo.svg"
         alt="Delta Air Lines">
+    <div class="username-border"></div>
+    <div class="username-container">DATA CREATOR</div>
     <span class="example-spacer"></span>
-    <button *ngIf="authenticated" mat-stroked-button color="accent" (click)="logoutUser()">Sign
-        Out</button>
-    <button *ngIf="!authenticated" mat-stroked-button color="accent" [routerLink]="['/user']">Sign
-        In</button>
+    <!-- <h7>{{user.username}}</h7> -->
+    <div class="username-container" *ngIf="authenticated">{{user.username}}</div>
+    <div class="username-border" *ngIf="authenticated"></div>
+    <button *ngIf="authenticated" mat-raised-button
+        style="background: #E51937;color: white;box-sizing: border-box;width: 67px;height: 24px;padding: 0px;border-radius: 0;"
+        (click)="logoutUser()">Log Out</button>
+    <button *ngIf="!authenticated" mat-raised-button
+        style="background: #E51937;color: white;box-sizing: border-box;width: 67px;height: 24px;padding: 0px;border-radius: 0;"
+        [routerLink]="['/user']">Log In</button>
 </mat-toolbar>
 
 <div class="example-container" [class.example-is-mobile]="mobileQuery.matches">
     <mat-sidenav-container class="example-sidenav-container">
         <mat-sidenav #snav [mode]="mobileQuery.matches ? 'side' : 'side'" fixedInViewport="true" fixedTopGap="56">
             <mat-nav-list>
-                <a mat-list-item class="nav-link" [routerLink]="['/home/user-profile']" [disabled]="!datasourceLoaded"><i
-                        class="material-icons">dashboard</i>User Dashboard</a>
+                <a mat-list-item class="nav-link" [routerLink]="['/home/user-profile']"
+                    [disabled]="!datasourceLoaded"><i class="material-icons">dashboard</i>User Dashboard</a>
             </mat-nav-list>
         </mat-sidenav>
         <mat-sidenav-content>

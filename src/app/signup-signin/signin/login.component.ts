@@ -56,7 +56,7 @@ export class LoginComponent implements OnInit {
       dialogRef.close();
       this.userDetails=data;
       loginRequest['password']='';
-      this.authService.login(loginRequest);
+      this.authService.login(this.userDetails);
       localStorage.setItem('dashboard', JSON.stringify(this.userDetails.dashboard));
       this.router.navigateByUrl('home');
       Swal.fire('Successfully Logged in as: ' , loginRequest.username, 'success');
