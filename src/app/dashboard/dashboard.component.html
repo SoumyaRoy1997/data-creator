@@ -13,16 +13,18 @@
             </form>
         </ng-container>
             <ng-container *ngIf="datasourceLoaded">
-                <h5 style="font-style: italic;font-weight: bold;">Recent Data Creation</h5>
+                <h5 style="font-style: italic;font-weight: bold;">Recent Data Creation Instances</h5>
                 <span *ngFor="let detail of scrapedDashboardList; let i = index"><button type="button"
-                        class="btn btn-outline-primary" (click)="showInstruction(detail.instructionfile,detail.dataGenInstanceName,detail.executionDate)">{{detail.dataGenInstanceName}}</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                <span><button type="button" class="btn btn-outline-info" [routerLink]="['/home/user-profile']">Show All..</button></span>
+                        class="btn btn-outline" (click)="showInstruction(detail.instructionfile,detail.dataGenInstanceName,detail.executionDate)" style="border: 1px solid #2A3A73;width: 145px;height: 36px;border-radius: 6px;color: black;font-family: 'Whitney';font-style: normal;font-weight: 350;font-size: 14px;line-height: 17px;">{{detail.dataGenInstanceName}}</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                <span><button type="button" class="btn btn-info" [routerLink]="['/home/user-profile']" style="border: 1px solid #2A3A73;border-radius: 6px;color: white;background: #2A3A73;width: 145px;height: 36px;position: absolute;font-family: 'Whitney';font-style: normal;font-weight: 350;font-size: 14px;line-height: 17px;">Show All Instances</button></span>
             </ng-container>
         </div>
         <div class="col-md-2"></div>
     </div>
 </div>
-
+<mat-toolbar style="background: white;color: black;" *ngIf="showForm">
+    {{formHeading}}
+    {{currentTestName}} {{currentTestTime | date:"MM/dd/yy hh:mm:ss"}}</mat-toolbar>
 <div class="container" *ngIf="showForm" style="margin-top: 1%;">
     <div class="row">
         <div class="col-md-2"></div>
